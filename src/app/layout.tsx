@@ -5,6 +5,7 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "請求書管理システム",
   description: "請求書の作成・管理・送付を行うシステム",
+  robots: { index: false, follow: false },
 }
 
 export default function RootLayout({
