@@ -19,6 +19,7 @@ model CompanyProfile {
   bankInfo         String // 振込先情報（JSON文字列）
   invoiceRegNumber String // 適格請求書発行事業者登録番号 (T+13桁)
   logoUrl          String? // ロゴ画像パス
+  sealUrl          String? // 社判画像パス
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }

@@ -48,3 +48,6 @@ prisma/dev.db-journal
 
 # fonts (large binary, download separately)
 public/fonts/*.ttf
+
+# uploaded images
+/uploads

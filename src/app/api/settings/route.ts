@@ -24,16 +24,24 @@ export async function PUT(request: Request) {
   const data = {
     ...parsed.data,
     bankInfo: JSON.stringify(parsed.data.bankInfo),
+    logoUrl: parsed.data.logoUrl || null,
+    sealUrl: parsed.data.sealUrl || null,
   }
 
-  const existing = await prisma.companyProfile.findFirst()
+  try {
+    const existing = await prisma.companyProfile.findFirst()
 
-  const profile = existing
-    ? await prisma.companyProfile.update({ where: { id: existing.id }, data })
-    : await prisma.companyProfile.create({ data })
+    const profile = existing
+      ? await prisma.companyProfile.update({ where: { id: existing.id }, data })
+      : await prisma.companyProfile.create({ data })
 
-  return NextResponse.json({
-    ...profile,
-    bankInfo: JSON.parse(profile.bankInfo),
-  })
+    return NextResponse.json({
+      ...profile,
+      bankInfo: JSON.parse(profile.bankInfo),
+    })
+  } catch (error) {
+    console.error("設定保存エラー:", error)
+    const message = error instanceof Error ? error.message : "保存に失敗しました"
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 }

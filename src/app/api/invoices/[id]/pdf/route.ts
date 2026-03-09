@@ -4,8 +4,10 @@ import { generateInvoicePdf } from "@/lib/pdf/generate-invoice-pdf"
 
 type Params = { params: Promise<{ id: string }> }
 
-export async function GET(_request: Request, { params }: Params) {
+export async function GET(request: Request, { params }: Params) {
   const { id } = await params
+  const { searchParams } = new URL(request.url)
+  const inline = searchParams.get("inline") === "1"
 
   try {
     const invoice = await prisma.invoice.findUnique({
@@ -33,7 +35,7 @@ export async function GET(_request: Request, { params }: Params) {
     return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="${invoice.invoiceNumber}.pdf"`,
+        "Content-Disposition": `${inline ? "inline" : "attachment"}; filename="${invoice.invoiceNumber}.pdf"`,
       },
     })
   } catch (error) {

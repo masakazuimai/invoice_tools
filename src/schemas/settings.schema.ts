@@ -18,7 +18,8 @@ export const companyProfileSchema = z.object({
   invoiceRegNumber: z
     .string()
     .regex(/^T\d{13}$/, "登録番号はT+13桁の数字です"),
-  logoUrl: z.string().optional(),
+  logoUrl: z.string().optional().default(""),
+  sealUrl: z.string().optional().default(""),
 })
 
 export type CompanyProfileInput = z.infer<typeof companyProfileSchema>

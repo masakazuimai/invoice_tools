@@ -1,7 +1,17 @@
 import PDFDocument from "pdfkit"
 import path from "path"
+import fs from "fs"
 import { formatCurrency, formatDateJP } from "@/lib/format"
 import type { BankInfo } from "@/schemas/settings.schema"
+
+function resolveImagePath(url: string | null | undefined): string | null {
+  if (!url) return null
+  // /api/upload/xxx.png → uploads/xxx.png
+  const match = url.match(/\/api\/upload\/(.+)$/)
+  if (!match) return null
+  const filePath = path.join(process.cwd(), "uploads", match[1])
+  return fs.existsSync(filePath) ? filePath : null
+}
 
 type InvoiceItem = {
   name: string
@@ -38,6 +48,8 @@ type CompanyData = {
   email: string
   bankInfo: string
   invoiceRegNumber: string
+  logoUrl?: string | null
+  sealUrl?: string | null
 }
 
 // A4サイズ: 595.28 x 841.89 pt
@@ -49,7 +61,9 @@ export async function generateInvoicePdf(
   invoice: InvoiceData,
   company: CompanyData
 ): Promise<Buffer> {
-  const fontPath = path.join(process.cwd(), "public/fonts/NotoSansJP-Regular.ttf")
+  const fontsDir = path.join(process.cwd(), "public/fonts")
+  const fontRegular = path.join(fontsDir, "NotoSansJP-Regular.ttf")
+  const fontBold = path.join(fontsDir, "NotoSansJP-Bold.ttf")
 
   const doc = new PDFDocument({
     size: "A4",
@@ -64,13 +78,14 @@ export async function generateInvoicePdf(
   doc.on("data", (chunk: Buffer) => chunks.push(chunk))
 
   // 日本語フォント登録
-  doc.registerFont("NotoSansJP", fontPath)
-  doc.font("NotoSansJP")
+  doc.registerFont("Regular", fontRegular)
+  doc.registerFont("Bold", fontBold)
+  doc.font("Regular")
 
   let y = MARGIN.top
 
   // --- タイトル ---
-  doc.fontSize(22).text("請求書", MARGIN.left, y, { align: "center" })
+  doc.font("Bold").fontSize(22).text("請求書", MARGIN.left, y, { align: "center" })
   y += 40
 
   // --- 宛先（左側）と請求書情報（右側）---
@@ -78,6 +93,7 @@ export async function generateInvoicePdf(
   const rightX = PAGE.width - MARGIN.right - 200
 
   // 宛先
+  doc.font("Regular")
   if (invoice.customer.zipCode) {
     doc.fontSize(9).text(`〒${invoice.customer.zipCode}`, leftX, y)
     y += 14
@@ -87,8 +103,9 @@ export async function generateInvoicePdf(
     y += 14
   }
   const customerY = y
-  doc.fontSize(14).text(`${invoice.customer.name} 御中`, leftX, y)
+  doc.font("Bold").fontSize(14).text(`${invoice.customer.name} 御中`, leftX, y)
   y += 22
+  doc.font("Regular")
   if (invoice.customer.contactPerson) {
     doc.fontSize(9).text(`${invoice.customer.contactPerson} 様`, leftX, y)
     y += 14
@@ -102,6 +119,42 @@ export async function generateInvoicePdf(
   doc.text(`発行日: ${formatDateJP(invoice.issueDate)}`, rightX, ry)
   ry += 14
   doc.text(`支払期限: ${formatDateJP(invoice.dueDate)}`, rightX, ry)
+  ry += 20
+
+  // --- 発行元情報（右上・支払期限の下）---
+  doc.font("Bold").fontSize(9).text(company.name, rightX, ry)
+  ry += 13
+  doc.font("Regular").fontSize(7.5)
+  doc.text(`〒${company.zipCode} ${company.address}`, rightX, ry)
+  ry += 11
+  doc.text(`TEL: ${company.phone}  Email: ${company.email}`, rightX, ry)
+  ry += 11
+  doc.text(`登録番号: ${company.invoiceRegNumber}`, rightX, ry)
+  ry += 15
+
+  // --- ロゴ・社判（発行元情報の下）---
+  const logoPath = resolveImagePath(company.logoUrl)
+  const sealPath = resolveImagePath(company.sealUrl)
+
+  if (logoPath || sealPath) {
+    const imgY = ry
+    let imgX = rightX
+    try {
+      if (logoPath) {
+        doc.image(logoPath, imgX, imgY, { height: 40 })
+        imgX += 50
+      }
+      if (sealPath) {
+        doc.image(sealPath, imgX, imgY, { height: 40 })
+      }
+      ry += 45
+    } catch (err) {
+      console.error("画像読み込みエラー:", err)
+    }
+  }
+
+  // 左側の宛先と右側の発行元の高さを揃える
+  y = Math.max(y, ry + 10)
 
   y += 10
 
@@ -111,11 +164,11 @@ export async function generateInvoicePdf(
 
   doc.fontSize(9).text("ご請求金額（税込）", leftX, y)
   y += 14
-  doc.fontSize(18).text(formatCurrency(invoice.totalAmount), leftX, y)
+  doc.font("Bold").fontSize(18).text(formatCurrency(invoice.totalAmount), leftX, y)
   y += 30
 
   // --- 罫線 ---
-  doc.moveTo(leftX, y).lineTo(PAGE.width - MARGIN.right, y).stroke()
+  doc.strokeColor("#333333").moveTo(leftX, y).lineTo(PAGE.width - MARGIN.right, y).stroke()
   y += 10
 
   // --- 明細テーブル ---
@@ -130,7 +183,7 @@ export async function generateInvoicePdf(
   ]
 
   // ヘッダー
-  doc.fontSize(8).fillColor("#666666")
+  doc.font("Bold").fontSize(8).fillColor("#444444")
   let cx = leftX
   for (const col of cols) {
     doc.text(col.label, cx, y, { width: col.width, align: col.align })
@@ -141,7 +194,7 @@ export async function generateInvoicePdf(
   y += 5
 
   // 行
-  doc.fillColor("#000000").fontSize(9)
+  doc.font("Regular").fillColor("#000000").fontSize(9)
   invoice.items.forEach((item, index) => {
     cx = leftX
     const rowData = [
@@ -161,7 +214,7 @@ export async function generateInvoicePdf(
   })
 
   y += 5
-  doc.moveTo(leftX, y).lineTo(PAGE.width - MARGIN.right, y).stroke()
+  doc.moveTo(leftX, y).lineTo(PAGE.width - MARGIN.right, y).strokeColor("#333333").stroke()
   y += 10
 
   // --- 軽減税率注記 ---
@@ -173,7 +226,7 @@ export async function generateInvoicePdf(
 
   // --- 税額サマリー（右寄せ）---
   const summaryX = PAGE.width - MARGIN.right - 250
-  doc.fontSize(9).fillColor("#000000")
+  doc.font("Regular").fontSize(9).fillColor("#000000")
 
   // 10%対象の小計を逆算
   const subtotal10 = invoice.subtotal - (has8 ? Math.round(invoice.taxAmount8 / 0.08) : 0)
@@ -196,16 +249,17 @@ export async function generateInvoicePdf(
   y += 14
   doc.text(`消費税合計: ${formatCurrency(invoice.taxAmount10 + invoice.taxAmount8)}`, summaryX, y, { width: 250, align: "right" })
   y += 14
-  doc.fontSize(12).text(`合計金額: ${formatCurrency(invoice.totalAmount)}`, summaryX, y, { width: 250, align: "right" })
+  doc.font("Bold").fontSize(13).text(`合計金額: ${formatCurrency(invoice.totalAmount)}`, summaryX, y, { width: 250, align: "right" })
   y += 25
 
   // --- 備考 ---
+  doc.font("Regular")
   if (invoice.notes) {
     doc.moveTo(leftX, y).lineTo(PAGE.width - MARGIN.right, y).strokeColor("#cccccc").stroke()
     y += 10
-    doc.fontSize(8).fillColor("#666666").text("備考:", leftX, y)
+    doc.font("Bold").fontSize(8).fillColor("#444444").text("備考:", leftX, y)
     y += 12
-    doc.fontSize(9).fillColor("#000000").text(invoice.notes, leftX, y, { width: CONTENT_WIDTH })
+    doc.font("Regular").fontSize(9).fillColor("#000000").text(invoice.notes, leftX, y, { width: CONTENT_WIDTH })
     y += doc.heightOfString(invoice.notes, { width: CONTENT_WIDTH }) + 10
   }
 
@@ -214,27 +268,15 @@ export async function generateInvoicePdf(
   doc.moveTo(leftX, y).lineTo(PAGE.width - MARGIN.right, y).strokeColor("#cccccc").stroke()
   y += 10
 
-  const bankInfo: BankInfo = JSON.parse(company.bankInfo)
-  doc.fontSize(9)
+  doc.font("Bold").fontSize(9).fillColor("#000000")
   doc.text("【お振込先】", leftX, y)
   y += 14
+  doc.font("Regular")
+  const bankInfo: BankInfo = JSON.parse(company.bankInfo)
   doc.text(`${bankInfo.bankName} ${bankInfo.branchName} ${bankInfo.accountType} ${bankInfo.accountNumber}`, leftX, y)
   y += 14
   doc.text(`口座名義: ${bankInfo.accountHolder}`, leftX, y)
   y += 25
-
-  // --- 発行元情報 ---
-  doc.moveTo(leftX, y).lineTo(PAGE.width - MARGIN.right, y).strokeColor("#cccccc").stroke()
-  y += 10
-
-  doc.fontSize(10).text(company.name, leftX, y)
-  y += 14
-  doc.fontSize(8)
-  doc.text(`〒${company.zipCode} ${company.address}`, leftX, y)
-  y += 12
-  doc.text(`TEL: ${company.phone}  Email: ${company.email}`, leftX, y)
-  y += 12
-  doc.text(`登録番号: ${company.invoiceRegNumber}`, leftX, y)
 
   doc.end()
 

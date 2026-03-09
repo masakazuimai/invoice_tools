@@ -24,21 +24,6 @@ export function InvoiceActions({ invoiceId, currentStatus }: Props) {
     router.refresh()
   }
 
-  const downloadPdf = async () => {
-    setLoading("pdf")
-    const res = await fetch(`/api/invoices/${invoiceId}/pdf`)
-    if (res.ok) {
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `invoice-${invoiceId}.pdf`
-      a.click()
-      URL.revokeObjectURL(url)
-    }
-    setLoading("")
-  }
-
   const sendEmail = async () => {
     setLoading("send")
     const res = await fetch(`/api/invoices/${invoiceId}/send`, { method: "POST" })
@@ -78,8 +63,11 @@ export function InvoiceActions({ invoiceId, currentStatus }: Props) {
 
   return (
     <div className="flex gap-2">
-      <Button variant="secondary" onClick={downloadPdf} disabled={loading === "pdf"}>
-        {loading === "pdf" ? "生成中..." : "PDF"}
+      <Button
+        variant="secondary"
+        onClick={() => window.open(`/api/invoices/${invoiceId}/pdf?inline=1`, "_blank")}
+      >
+        PDF
       </Button>
 
       <Button variant="secondary" onClick={duplicate} disabled={loading === "duplicate"}>

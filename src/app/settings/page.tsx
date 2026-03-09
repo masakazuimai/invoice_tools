@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import { ImageUpload } from "@/components/ui/image-upload"
 import type { CompanyProfileInput } from "@/schemas/settings.schema"
 
 const defaultProfile: CompanyProfileInput = {
@@ -22,6 +23,8 @@ const defaultProfile: CompanyProfileInput = {
     accountHolder: "",
   },
   invoiceRegNumber: "",
+  logoUrl: "",
+  sealUrl: "",
 }
 
 export default function SettingsPage() {
@@ -62,13 +65,20 @@ export default function SettingsPage() {
     })
 
     if (!res.ok) {
-      const data = await res.json()
-      if (data.errors?.fieldErrors) {
-        const flat: Record<string, string> = {}
-        for (const [key, msgs] of Object.entries(data.errors.fieldErrors)) {
-          flat[key] = (msgs as string[])[0]
+      const text = await res.text()
+      try {
+        const data = JSON.parse(text)
+        if (data.errors?.fieldErrors) {
+          const flat: Record<string, string> = {}
+          for (const [key, msgs] of Object.entries(data.errors.fieldErrors)) {
+            flat[key] = (msgs as string[])[0]
+          }
+          setErrors(flat)
+        } else if (data.error) {
+          setMessage(data.error)
         }
-        setErrors(flat)
+      } catch {
+        setMessage("保存に失敗しました")
       }
     } else {
       setMessage("保存しました")
@@ -93,6 +103,25 @@ export default function SettingsPage() {
                 <Input label="住所" value={form.address} onChange={(e) => updateField("address", e.target.value)} error={errors.address} />
               </div>
               <Input label="メールアドレス" type="email" value={form.email} onChange={(e) => updateField("email", e.target.value)} error={errors.email} />
+            </div>
+          </Card>
+
+          <Card>
+            <h2 className="mb-4 text-lg font-semibold">ロゴ・社判</h2>
+            <p className="mb-4 text-sm text-gray-500">PDFの右上（自社情報欄）に表示されます。PNG/JPEG/WebP、2MB以下。</p>
+            <div className="grid gap-6 sm:grid-cols-2">
+              <ImageUpload
+                label="ロゴ"
+                value={form.logoUrl}
+                onChange={(url) => updateField("logoUrl", url)}
+                onClear={() => updateField("logoUrl", "")}
+              />
+              <ImageUpload
+                label="社判"
+                value={form.sealUrl}
+                onChange={(url) => updateField("sealUrl", url)}
+                onClear={() => updateField("sealUrl", "")}
+              />
             </div>
           </Card>
 
