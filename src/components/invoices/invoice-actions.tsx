@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button"
 type Props = {
   invoiceId: string
   currentStatus: string
+  canDelete?: boolean
 }
 
-export function InvoiceActions({ invoiceId, currentStatus }: Props) {
+export function InvoiceActions({ invoiceId, currentStatus, canDelete = true }: Props) {
   const router = useRouter()
   const [loading, setLoading] = useState("")
 
@@ -74,15 +75,39 @@ export function InvoiceActions({ invoiceId, currentStatus }: Props) {
         {loading === "duplicate" ? "複製中..." : "複製"}
       </Button>
 
-      {currentStatus === "draft" && (
-        <Button onClick={sendEmail} disabled={loading === "send"}>
-          {loading === "send" ? "送信中..." : "メール送信"}
-        </Button>
-      )}
+      <Button
+        variant="secondary"
+        onClick={async () => {
+          setLoading("to-dn")
+          const res = await fetch(`/api/invoices/${invoiceId}/convert-to-delivery-note`, { method: "POST" })
+          if (res.ok) {
+            const dn = await res.json()
+            router.push(`/delivery-notes/${dn.id}`)
+          } else {
+            const data = await res.json()
+            alert(data.error ?? "変換に失敗しました")
+          }
+          setLoading("")
+        }}
+        disabled={loading === "to-dn"}
+      >
+        {loading === "to-dn" ? "作成中..." : "納品書を作成"}
+      </Button>
 
       {currentStatus === "draft" && (
-        <Button variant="secondary" onClick={() => updateStatus("sent")} disabled={loading === "sent"}>
-          送信済みにする
+        <>
+          <Button onClick={sendEmail} disabled={loading === "send"}>
+            {loading === "send" ? "送信中..." : "メール送信"}
+          </Button>
+          <Button variant="secondary" onClick={() => updateStatus("sent")} disabled={loading === "sent"}>
+            送信済みにする
+          </Button>
+        </>
+      )}
+
+      {currentStatus !== "draft" && canDelete && (
+        <Button variant="secondary" onClick={() => updateStatus("draft")} disabled={loading === "draft"}>
+          下書きに戻す
         </Button>
       )}
 
@@ -92,9 +117,36 @@ export function InvoiceActions({ invoiceId, currentStatus }: Props) {
         </Button>
       )}
 
-      <Button variant="danger" onClick={deleteInvoice} disabled={loading === "delete"}>
-        {loading === "delete" ? "削除中..." : "削除"}
-      </Button>
+      {currentStatus === "paid" && (
+        <Button
+          variant="secondary"
+          onClick={async () => {
+            setLoading("receipt")
+            const res = await fetch(`/api/invoices/${invoiceId}/create-receipt`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({}),
+            })
+            if (res.ok) {
+              const receipt = await res.json()
+              router.push(`/receipts/${receipt.id}`)
+            } else {
+              const data = await res.json()
+              alert(data.error ?? "領収書の発行に失敗しました")
+            }
+            setLoading("")
+          }}
+          disabled={loading === "receipt"}
+        >
+          {loading === "receipt" ? "発行中..." : "領収書を発行"}
+        </Button>
+      )}
+
+      {canDelete && (
+        <Button variant="danger" onClick={deleteInvoice} disabled={loading === "delete"}>
+          {loading === "delete" ? "削除中..." : "削除"}
+        </Button>
+      )}
     </div>
   )
 }

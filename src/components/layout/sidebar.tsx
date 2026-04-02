@@ -5,7 +5,10 @@ import { usePathname } from "next/navigation"
 
 const navItems = [
   { href: "/dashboard", label: "ダッシュボード", icon: "📊" },
+  { href: "/quotations", label: "見積書", icon: "📋" },
+  { href: "/delivery-notes", label: "納品書", icon: "📦" },
   { href: "/invoices", label: "請求書", icon: "📄" },
+  { href: "/receipts", label: "領収書", icon: "🧾" },
   { href: "/customers", label: "顧客", icon: "👥" },
   { href: "/items", label: "品目", icon: "📦" },
   { href: "/settings", label: "設定", icon: "⚙️" },

@@ -33,8 +33,12 @@ model Customer {
   phone         String?
   email         String?
   contactPerson String? // 担当者名
+  contactTitle  String? // 役職
   memo          String?
   invoices      Invoice[]
+  quotations    Quotation[]
+  deliveryNotes DeliveryNote[]
+  receipts      Receipt[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -46,9 +50,11 @@ model Item {
   unitPrice    Int // 単価（円）
   unit         String        @default("個") // 単位
   taxRate      Int           @default(10) // 税率: 10 or 8
-  description  String?
-  invoiceItems InvoiceItem[]
-  createdAt    DateTime      @default(now())
+  description    String?
+  invoiceItems   InvoiceItem[]
+  quotationItems    QuotationItem[]
+  deliveryNoteItems DeliveryNoteItem[]
+  createdAt         DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 }
 
@@ -65,8 +71,13 @@ model Invoice {
   taxAmount10   Int           @default(0) // 10%対象税額
   taxAmount8    Int           @default(0) // 8%対象税額
   totalAmount   Int           @default(0) // 合計金額（税込）
+  quotationId    String? // 元になった見積書
+  deliveryNoteId String? // 元になった納品書
+  subject        String? // 件名
   notes         String? // 備考
-  items         InvoiceItem[]
+  items          InvoiceItem[]
+  receipts       Receipt[]
+  deliveryNotes  DeliveryNote[]
   sentAt        DateTime? // 送信日時
   paidAt        DateTime? // 入金日時
   createdAt     DateTime      @default(now())
@@ -87,4 +98,99 @@ model InvoiceItem {
   taxRate   Int // 税率 10 or 8
   amount    Int // 金額（税抜）
   sortOrder Int     @default(0)
+}
+
+// 見積書
+model Quotation {
+  id              String          @id @default(cuid())
+  quotationNumber String          @unique // QUO-YYYYMM-XXXX
+  customerId      String
+  customer        Customer        @relation(fields: [customerId], references: [id])
+  issueDate       DateTime // 発行日
+  validUntil      DateTime // 有効期限
+  status          String          @default("draft") // draft, sent, accepted, rejected, expired
+  subtotal        Int             @default(0)
+  taxAmount10     Int             @default(0)
+  taxAmount8      Int             @default(0)
+  totalAmount     Int             @default(0)
+  subject         String? // 件名
+  notes           String?
+  items           QuotationItem[]
+  sentAt          DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+// 見積書明細
+model QuotationItem {
+  id          String    @id @default(cuid())
+  quotationId String
+  quotation   Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  itemId      String?
+  item        Item?     @relation(fields: [itemId], references: [id])
+  name        String // 品目名（スナップショット）
+  quantity    Int
+  unit        String
+  unitPrice   Int
+  taxRate     Int
+  amount      Int
+  sortOrder   Int       @default(0)
+}
+
+// 納品書
+model DeliveryNote {
+  id                 String            @id @default(cuid())
+  deliveryNoteNumber String            @unique // DLV-YYYYMM-XXXX
+  customerId         String
+  customer           Customer          @relation(fields: [customerId], references: [id])
+  quotationId        String? // 元になった見積書
+  invoiceId          String? // 請求済みの請求書
+  invoice            Invoice? @relation(fields: [invoiceId], references: [id])
+  issueDate          DateTime // 発行日
+  deliveryDate       DateTime // 納品日
+  status             String            @default("draft") // draft, delivered
+  subtotal           Int               @default(0)
+  taxAmount10        Int               @default(0)
+  taxAmount8         Int               @default(0)
+  totalAmount        Int               @default(0)
+  subject            String?
+  notes              String?
+  items              DeliveryNoteItem[]
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+}
+
+// 納品書明細
+model DeliveryNoteItem {
+  id             String       @id @default(cuid())
+  deliveryNoteId String
+  deliveryNote   DeliveryNote @relation(fields: [deliveryNoteId], references: [id], onDelete: Cascade)
+  itemId         String?
+  item           Item?        @relation(fields: [itemId], references: [id])
+  name           String
+  quantity       Int
+  unit           String
+  unitPrice      Int
+  taxRate        Int
+  amount         Int
+  sortOrder      Int          @default(0)
+}
+
+// 領収書
+model Receipt {
+  id            String   @id @default(cuid())
+  receiptNumber String   @unique // RCP-YYYYMM-XXXX
+  customerId    String
+  customer      Customer @relation(fields: [customerId], references: [id])
+  invoiceId     String // 対応する請求書
+  invoice       Invoice  @relation(fields: [invoiceId], references: [id])
+  issueDate     DateTime // 発行日
+  totalAmount   Int // 領収金額
+  taxAmount10   Int      @default(0)
+  taxAmount8    Int      @default(0)
+  paymentMethod String   @default("bankTransfer") // bankTransfer, cash, other
+  subject       String? // 但し書き
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

@@ -13,6 +13,7 @@ export const createInvoiceSchema = z.object({
   customerId: z.string().min(1, "顧客を選択してください"),
   issueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "日付の形式が正しくありません"),
   dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "日付の形式が正しくありません"),
+  subject: z.string().optional(),
   items: z.array(invoiceItemSchema).min(1, "明細を1行以上追加してください"),
   notes: z.string().optional(),
 })

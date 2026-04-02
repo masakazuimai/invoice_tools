@@ -17,6 +17,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ errors: parsed.error.flatten() }, { status: 400 })
   }
 
-  const customer = await prisma.customer.create({ data: parsed.data })
-  return NextResponse.json(customer, { status: 201 })
+  try {
+    const customer = await prisma.customer.create({ data: parsed.data })
+    return NextResponse.json(customer, { status: 201 })
+  } catch (error) {
+    console.error("顧客作成エラー:", error)
+    const message = error instanceof Error ? error.message : "作成に失敗しました"
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 }

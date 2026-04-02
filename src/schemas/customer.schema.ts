@@ -7,6 +7,7 @@ export const customerSchema = z.object({
   phone: z.string().optional(),
   email: z.string().email("メールアドレスの形式が正しくありません").optional().or(z.literal("")),
   contactPerson: z.string().optional(),
+  contactTitle: z.string().optional(),
   memo: z.string().optional(),
 })
 

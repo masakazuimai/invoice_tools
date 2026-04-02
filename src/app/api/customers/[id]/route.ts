@@ -22,11 +22,17 @@ export async function PUT(request: Request, { params }: Params) {
     return NextResponse.json({ errors: parsed.error.flatten() }, { status: 400 })
   }
 
-  const customer = await prisma.customer.update({
-    where: { id },
-    data: parsed.data,
-  })
-  return NextResponse.json(customer)
+  try {
+    const customer = await prisma.customer.update({
+      where: { id },
+      data: parsed.data,
+    })
+    return NextResponse.json(customer)
+  } catch (error) {
+    console.error("顧客更新エラー:", error)
+    const message = error instanceof Error ? error.message : "更新に失敗しました"
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 }
 
 export async function DELETE(_request: Request, { params }: Params) {

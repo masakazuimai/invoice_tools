@@ -31,6 +31,7 @@ type InvoiceData = {
     zipCode?: string | null
     address?: string | null
     contactPerson?: string | null
+    contactTitle?: string | null
   }
   items: InvoiceItem[]
   subtotal: number
@@ -107,7 +108,8 @@ export async function generateInvoicePdf(
   y += 22
   doc.font("Regular")
   if (invoice.customer.contactPerson) {
-    doc.fontSize(9).text(`${invoice.customer.contactPerson} 様`, leftX, y)
+    const title = invoice.customer.contactTitle ? `${invoice.customer.contactTitle} ` : ""
+    doc.fontSize(9).text(`${title}${invoice.customer.contactPerson} 様`, leftX, y)
     y += 14
   }
 

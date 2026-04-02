@@ -25,6 +25,7 @@ export default async function EditInvoicePage({ params }: Props) {
           customerId: invoice.customerId,
           issueDate: invoice.issueDate.toISOString().split("T")[0],
           dueDate: invoice.dueDate.toISOString().split("T")[0],
+          subject: invoice.subject ?? "",
           items: invoice.items.map((item) => ({
             itemId: item.itemId ?? undefined,
             name: item.name,

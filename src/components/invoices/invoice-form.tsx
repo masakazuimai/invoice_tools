@@ -20,6 +20,7 @@ type InvoiceData = {
   customerId: string
   issueDate: string
   dueDate: string
+  subject: string
   items: InvoiceItemInput[]
   notes: string
 }
@@ -51,6 +52,7 @@ export function InvoiceForm({ initialData }: Props) {
   const [customerId, setCustomerId] = useState(initialData?.customerId ?? "")
   const [issueDate, setIssueDate] = useState(initialData?.issueDate ?? toDateString(new Date()))
   const [dueDate, setDueDate] = useState(initialData?.dueDate ?? "")
+  const [subject, setSubject] = useState(initialData?.subject ?? "")
   const [items, setItems] = useState<InvoiceItemInput[]>(
     initialData?.items ?? [{ ...emptyItem }]
   )
@@ -118,7 +120,7 @@ export function InvoiceForm({ initialData }: Props) {
     setSaving(true)
     setErrors({})
 
-    const payload = { customerId, issueDate, dueDate, items, notes }
+    const payload = { customerId, issueDate, dueDate, subject, items, notes }
     const url = isEdit ? `/api/invoices/${initialData?.id}` : "/api/invoices"
     const method = isEdit ? "PUT" : "POST"
 
@@ -151,7 +153,7 @@ export function InvoiceForm({ initialData }: Props) {
       {/* 基本情報 */}
       <Card>
         <h2 className="mb-4 text-lg font-semibold">基本情報</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2">
           <Select
             label="顧客"
             value={customerId}
@@ -159,6 +161,12 @@ export function InvoiceForm({ initialData }: Props) {
             options={customers.map((c) => ({ value: c.id, label: c.name }))}
             placeholder="顧客を選択"
             error={errors.customerId}
+          />
+          <Input
+            label="件名"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            placeholder="Webサイト制作の件"
           />
           <Input
             label="発行日"

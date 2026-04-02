@@ -22,6 +22,10 @@ export function formatStatus(status: string): string {
     sent: "送信済み",
     paid: "入金済み",
     overdue: "期限超過",
+    delivered: "納品済み",
+    accepted: "承認済み",
+    rejected: "却下",
+    expired: "期限切れ",
   }
   return statusMap[status] ?? status
 }
@@ -33,6 +37,10 @@ export function statusColor(status: string): string {
     sent: "bg-blue-100 text-blue-700",
     paid: "bg-green-100 text-green-700",
     overdue: "bg-red-100 text-red-700",
+    delivered: "bg-green-100 text-green-700",
+    accepted: "bg-green-100 text-green-700",
+    rejected: "bg-red-100 text-red-700",
+    expired: "bg-yellow-100 text-yellow-700",
   }
   return colorMap[status] ?? "bg-gray-100 text-gray-700"
 }

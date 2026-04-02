@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ errors: parsed.error.flatten() }, { status: 400 })
   }
 
-  const { customerId, issueDate, dueDate, items, notes } = parsed.data
+  const { customerId, issueDate, dueDate, subject, items, notes } = parsed.data
 
   // 明細行の金額を計算
   const itemsWithAmount = items.map((item, index) => ({
@@ -51,6 +51,7 @@ export async function POST(request: Request) {
       customerId,
       issueDate: new Date(issueDate),
       dueDate: new Date(dueDate),
+      subject,
       subtotal: taxSummary.subtotal,
       taxAmount10: taxSummary.tax10,
       taxAmount8: taxSummary.tax8,

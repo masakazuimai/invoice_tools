@@ -37,6 +37,10 @@ export async function PUT(request: Request, { params }: Params) {
     if (statusParsed.data.status === "paid") {
       data.paidAt = new Date()
     }
+    if (statusParsed.data.status === "draft") {
+      data.sentAt = null
+      data.paidAt = null
+    }
 
     const invoice = await prisma.invoice.update({
       where: { id },
@@ -52,7 +56,7 @@ export async function PUT(request: Request, { params }: Params) {
     return NextResponse.json({ errors: parsed.error.flatten() }, { status: 400 })
   }
 
-  const { customerId, issueDate, dueDate, items, notes } = parsed.data
+  const { customerId, issueDate, dueDate, subject, items, notes } = parsed.data
 
   const itemsWithAmount = items.map((item, index) => ({
     ...item,
@@ -76,6 +80,7 @@ export async function PUT(request: Request, { params }: Params) {
       customerId,
       issueDate: new Date(issueDate),
       dueDate: new Date(dueDate),
+      subject,
       subtotal: taxSummary.subtotal,
       taxAmount10: taxSummary.tax10,
       taxAmount8: taxSummary.tax8,
@@ -102,6 +107,19 @@ export async function PUT(request: Request, { params }: Params) {
 
 export async function DELETE(_request: Request, { params }: Params) {
   const { id } = await params
+
+  // 領収書が紐付いている場合は削除不可
+  const receiptCount = await prisma.receipt.count({ where: { invoiceId: id } })
+  if (receiptCount > 0) {
+    return NextResponse.json({ error: "領収書が発行済みのため削除できません" }, { status: 400 })
+  }
+
+  // 納品書が紐付いている場合は参照をクリア
+  await prisma.deliveryNote.updateMany({
+    where: { invoiceId: id },
+    data: { invoiceId: null },
+  })
+
   await prisma.invoice.delete({ where: { id } })
   return NextResponse.json({ success: true })
 }

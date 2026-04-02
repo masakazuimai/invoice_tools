@@ -25,6 +25,10 @@ export default async function InvoiceDetailPage({ params }: Props) {
   // 自社情報を取得
   const profile = await prisma.companyProfile.findFirst()
 
+  // 領収書が紐付いていなければ削除・ステータス変更可能
+  const receiptCount = await prisma.receipt.count({ where: { invoiceId: id } })
+  const canDelete = receiptCount === 0
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -36,7 +40,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
                 <Button variant="secondary">編集</Button>
               </Link>
             )}
-            <InvoiceActions invoiceId={invoice.id} currentStatus={invoice.status} />
+            <InvoiceActions invoiceId={invoice.id} currentStatus={invoice.status} canDelete={canDelete} />
           </div>
         }
       />
@@ -59,12 +63,20 @@ export default async function InvoiceDetailPage({ params }: Props) {
             <div className="mb-6">
               <p className="text-lg font-semibold">{invoice.customer.name} 御中</p>
               {invoice.customer.contactPerson && (
-                <p className="text-sm text-gray-600">{invoice.customer.contactPerson} 様</p>
+                <p className="text-sm text-gray-600">{invoice.customer.contactTitle ? `${invoice.customer.contactTitle} ` : ""}{invoice.customer.contactPerson} 様</p>
               )}
               {invoice.customer.address && (
                 <p className="text-sm text-gray-500">{invoice.customer.address}</p>
               )}
             </div>
+
+            {/* 件名 */}
+            {invoice.subject && (
+              <div className="mb-6">
+                <p className="text-sm text-gray-500">件名</p>
+                <p className="font-medium">{invoice.subject}</p>
+              </div>
+            )}
 
             {/* 明細テーブル */}
             <table className="w-full text-sm mb-6">
@@ -161,6 +173,26 @@ export default async function InvoiceDetailPage({ params }: Props) {
                 <div>
                   <dt className="text-gray-500">入金日</dt>
                   <dd>{formatDateJP(invoice.paidAt)}</dd>
+                </div>
+              )}
+              {invoice.quotationId && (
+                <div>
+                  <dt className="text-gray-500">元の見積書</dt>
+                  <dd>
+                    <Link href={`/quotations/${invoice.quotationId}`} className="text-blue-600 hover:text-blue-800">
+                      見積書を表示
+                    </Link>
+                  </dd>
+                </div>
+              )}
+              {invoice.deliveryNoteId && (
+                <div>
+                  <dt className="text-gray-500">元の納品書</dt>
+                  <dd>
+                    <Link href={`/delivery-notes/${invoice.deliveryNoteId}`} className="text-blue-600 hover:text-blue-800">
+                      納品書を表示
+                    </Link>
+                  </dd>
                 </div>
               )}
             </dl>

@@ -20,9 +20,14 @@ export default async function InvoicesPage() {
         title="請求書一覧"
         description={`${invoices.length}件の請求書`}
         actions={
-          <Link href="/invoices/new">
-            <Button>新規作成</Button>
-          </Link>
+          <div className="flex gap-3">
+            <Link href="/invoices/generate">
+              <Button variant="secondary">納品書から合算</Button>
+            </Link>
+            <Link href="/invoices/new">
+              <Button>新規作成</Button>
+            </Link>
+          </div>
         }
       />
       <Card className="p-0 overflow-hidden">
