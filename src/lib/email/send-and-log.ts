@@ -9,6 +9,7 @@ type SendAndLogParams = {
   subject: string
   bodyText: string
   pdfBuffer: Buffer
+  fromName?: string // 差出人の表示名（自社名）
 }
 
 // メール送信し、成否をEmailLogに記録する。失敗時はログを残したうえで再スロー
@@ -20,9 +21,10 @@ export async function sendAndLogEmail({
   subject,
   bodyText,
   pdfBuffer,
+  fromName,
 }: SendAndLogParams) {
   try {
-    await sendDocumentEmail({ to, subject, bodyText, documentNumber, pdfBuffer })
+    await sendDocumentEmail({ to, subject, bodyText, documentNumber, pdfBuffer, fromName })
 
     await prisma.emailLog.create({
       data: { documentType, documentId, documentNumber, to, subject, status: "sent" },

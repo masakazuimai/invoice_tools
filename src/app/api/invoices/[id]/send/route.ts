@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
 import { generateInvoicePdf } from "@/lib/pdf/generate-invoice-pdf"
 import { sendAndLogEmail } from "@/lib/email/send-and-log"
-import { buildSubject, buildDefaultBodyText } from "@/lib/email/send-document-email"
+import { buildSubject, buildDefaultBodyText, isEmailConfigured } from "@/lib/email/send-document-email"
 import { formatCurrency, formatDateJP, formatYearMonthJP } from "@/lib/format"
 
 type Params = { params: Promise<{ id: string }> }
@@ -69,9 +69,9 @@ export async function POST(request: Request, { params }: Params) {
     return NextResponse.json({ error: "自社情報が設定されていません" }, { status: 400 })
   }
 
-  if (!process.env.RESEND_API_KEY) {
+  if (!isEmailConfigured()) {
     return NextResponse.json(
-      { error: "メール送信の設定がされていません（RESEND_API_KEY）" },
+      { error: "メール送信の設定がされていません（SMTP設定）" },
       { status: 400 }
     )
   }
@@ -97,6 +97,7 @@ export async function POST(request: Request, { params }: Params) {
     const pdfBuffer = await generateInvoicePdf(invoice, company)
 
     await sendAndLogEmail({
+      fromName: company.name,
       documentType: DOCUMENT_TYPE,
       documentId: invoice.id,
       documentNumber: invoice.invoiceNumber,

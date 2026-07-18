@@ -1,7 +1,23 @@
-import { Resend } from "resend"
+import nodemailer from "nodemailer"
 
-function getResend() {
-  return new Resend(process.env.RESEND_API_KEY)
+// SMTP送信用のトランスポーターを生成（ConoHa等のサーバーメール）
+function getTransporter() {
+  const port = Number(process.env.SMTP_PORT ?? 465)
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port,
+    // 465はSSL、587はSTARTTLS。SMTP_SECUREで明示指定も可能
+    secure: process.env.SMTP_SECURE ? process.env.SMTP_SECURE === "true" : port === 465,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  })
+}
+
+// SMTP送信に必要な設定が揃っているか
+export function isEmailConfigured(): boolean {
+  return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS)
 }
 
 export type DocumentType = "invoice" | "quotation" | "delivery-note" | "receipt"
@@ -84,6 +100,7 @@ type SendDocumentEmailParams = {
   bodyText: string
   documentNumber: string
   pdfBuffer: Buffer
+  fromName?: string // 差出人の表示名（自社名）。指定時は「表示名 <アドレス>」で送る
 }
 
 export async function sendDocumentEmail({
@@ -92,21 +109,27 @@ export async function sendDocumentEmail({
   bodyText,
   documentNumber,
   pdfBuffer,
+  fromName,
 }: SendDocumentEmailParams) {
-  const { error } = await getResend().emails.send({
-    from: process.env.EMAIL_FROM ?? "noreply@example.com",
-    to,
-    subject,
-    html: textToHtml(bodyText),
-    attachments: [
-      {
-        filename: `${documentNumber}.pdf`,
-        content: pdfBuffer,
-      },
-    ],
-  })
+  const address = process.env.EMAIL_FROM || process.env.SMTP_USER || ""
+  const from = fromName ? { name: fromName, address } : address
 
-  if (error) {
-    throw new Error(`メール送信に失敗しました: ${error.message}`)
+  try {
+    await getTransporter().sendMail({
+      from,
+      to,
+      subject,
+      text: bodyText,
+      html: textToHtml(bodyText),
+      attachments: [
+        {
+          filename: `${documentNumber}.pdf`,
+          content: pdfBuffer,
+        },
+      ],
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "不明なエラー"
+    throw new Error(`メール送信に失敗しました: ${message}`)
   }
 }
