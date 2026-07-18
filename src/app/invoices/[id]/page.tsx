@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatCurrency, formatDateJP, formatStatus, statusColor } from "@/lib/format"
 import { InvoiceActions } from "@/components/invoices/invoice-actions"
+import { EmailHistoryCard } from "@/components/email/email-history-card"
 
 type Props = { params: Promise<{ id: string }> }
 
@@ -209,6 +210,8 @@ export default async function InvoiceDetailPage({ params }: Props) {
               </div>
             </Card>
           )}
+
+          <EmailHistoryCard documentType="invoice" documentId={invoice.id} />
         </div>
       </div>
     </div>

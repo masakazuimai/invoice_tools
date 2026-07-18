@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { SendEmailButton } from "@/components/email/send-email-button"
 
 type Props = {
   deliveryNoteId: string
@@ -44,6 +45,8 @@ export function DeliveryNoteActions({ deliveryNoteId, currentStatus }: Props) {
       >
         PDF
       </Button>
+
+      <SendEmailButton endpoint={`/api/delivery-notes/${deliveryNoteId}/send`} />
 
       <Button
         variant="secondary"

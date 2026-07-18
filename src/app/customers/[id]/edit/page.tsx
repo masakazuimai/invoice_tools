@@ -24,6 +24,7 @@ export default async function EditCustomerPage({ params }: Props) {
           email: customer.email ?? "",
           contactPerson: customer.contactPerson ?? "",
           contactTitle: customer.contactTitle ?? "",
+          staffName: customer.staffName ?? "",
           memo: customer.memo ?? "",
         }}
       />

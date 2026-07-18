@@ -8,6 +8,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// メール送信履歴
+model EmailLog {
+  id             String   @id @default(cuid())
+  documentType   String // invoice, quotation, delivery-note, receipt
+  documentId     String // 各書類のID
+  documentNumber String // INV-YYYYMM-XXXX など
+  to             String // 送信先メールアドレス
+  subject        String // メール件名
+  status         String   @default("sent") // sent, failed
+  errorMessage   String? // 失敗時のエラー内容
+  createdAt      DateTime @default(now())
+
+  @@index([documentType, documentId])
+}
+
 // 自社情報
 model CompanyProfile {
   id               String   @id @default(cuid())
@@ -32,8 +47,9 @@ model Customer {
   address       String?
   phone         String?
   email         String?
-  contactPerson String? // 担当者名
-  contactTitle  String? // 役職
+  contactPerson String? // 代表者名（請求書等に記載）
+  contactTitle  String? // 代表者の役職
+  staffName     String? // 担当者名（メール宛名用。未設定なら代表者を使用）
   memo          String?
   invoices      Invoice[]
   quotations    Quotation[]

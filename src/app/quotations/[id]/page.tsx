@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatCurrency, formatDateJP, formatStatus, statusColor } from "@/lib/format"
 import { QuotationActions } from "@/components/quotations/quotation-actions"
+import { EmailHistoryCard } from "@/components/email/email-history-card"
 
 type Props = { params: Promise<{ id: string }> }
 
@@ -179,6 +180,8 @@ export default async function QuotationDetailPage({ params }: Props) {
               </div>
             </Card>
           )}
+
+          <EmailHistoryCard documentType="quotation" documentId={quotation.id} />
         </div>
       </div>
     </div>

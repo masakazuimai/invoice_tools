@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatCurrency, formatDateJP, formatStatus, statusColor } from "@/lib/format"
 import { DeliveryNoteActions } from "@/components/delivery-notes/delivery-note-actions"
+import { EmailHistoryCard } from "@/components/email/email-history-card"
 
 type Props = { params: Promise<{ id: string }> }
 
@@ -157,6 +158,8 @@ export default async function DeliveryNoteDetailPage({ params }: Props) {
               </div>
             </Card>
           )}
+
+          <EmailHistoryCard documentType="delivery-note" documentId={deliveryNote.id} />
         </div>
       </div>
     </div>

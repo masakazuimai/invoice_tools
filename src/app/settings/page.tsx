@@ -17,7 +17,9 @@ const defaultProfile: CompanyProfileInput = {
   email: "",
   bankInfo: {
     bankName: "",
+    bankCode: "",
     branchName: "",
+    branchCode: "",
     accountType: "普通",
     accountNumber: "",
     accountHolder: "",
@@ -129,7 +131,9 @@ export default function SettingsPage() {
             <h2 className="mb-4 text-lg font-semibold">振込先情報</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <Input label="銀行名" value={form.bankInfo.bankName} onChange={(e) => updateBankField("bankName", e.target.value)} />
+              <Input label="金融機関コード" value={form.bankInfo.bankCode ?? ""} onChange={(e) => updateBankField("bankCode", e.target.value)} placeholder="0001（4桁）" />
               <Input label="支店名" value={form.bankInfo.branchName} onChange={(e) => updateBankField("branchName", e.target.value)} />
+              <Input label="支店コード" value={form.bankInfo.branchCode ?? ""} onChange={(e) => updateBankField("branchCode", e.target.value)} placeholder="064（3桁）" />
               <Select
                 label="口座種別"
                 value={form.bankInfo.accountType}

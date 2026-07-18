@@ -20,6 +20,7 @@ const defaultData: CustomerInput = {
   email: "",
   contactPerson: "",
   contactTitle: "",
+  staffName: "",
   memo: "",
 }
 
@@ -79,8 +80,9 @@ export function CustomerForm({ initialData }: Props) {
           <div className="sm:col-span-2">
             <Input label="顧客名（会社名）" value={form.name} onChange={(e) => updateField("name", e.target.value)} error={errors.name} />
           </div>
-          <Input label="担当者名" value={form.contactPerson ?? ""} onChange={(e) => updateField("contactPerson", e.target.value)} />
-          <Input label="役職" value={form.contactTitle ?? ""} onChange={(e) => updateField("contactTitle", e.target.value)} placeholder="部長、課長など" />
+          <Input label="代表者名" value={form.contactPerson ?? ""} onChange={(e) => updateField("contactPerson", e.target.value)} placeholder="請求書等に記載" />
+          <Input label="代表者の役職" value={form.contactTitle ?? ""} onChange={(e) => updateField("contactTitle", e.target.value)} placeholder="代表取締役 など" />
+          <Input label="担当者名" value={form.staffName ?? ""} onChange={(e) => updateField("staffName", e.target.value)} placeholder="メール宛名に使用（未入力なら代表者宛）" />
           <Input label="メールアドレス" type="email" value={form.email ?? ""} onChange={(e) => updateField("email", e.target.value)} error={errors.email} />
           <Input label="電話番号" value={form.phone ?? ""} onChange={(e) => updateField("phone", e.target.value)} />
           <Input label="郵便番号" value={form.zipCode ?? ""} onChange={(e) => updateField("zipCode", e.target.value)} />

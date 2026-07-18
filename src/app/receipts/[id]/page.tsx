@@ -3,8 +3,9 @@ import Link from "next/link"
 import { prisma } from "@/lib/db"
 import { PageHeader } from "@/components/layout/page-header"
 import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { formatCurrency, formatDateJP } from "@/lib/format"
+import { ReceiptActions } from "@/components/receipts/receipt-actions"
+import { EmailHistoryCard } from "@/components/email/email-history-card"
 
 type Props = { params: Promise<{ id: string }> }
 
@@ -28,18 +29,7 @@ export default async function ReceiptDetailPage({ params }: Props) {
     <div className="space-y-6">
       <PageHeader
         title={`領収書 ${receipt.receiptNumber}`}
-        actions={
-          <div className="flex gap-3">
-            <Button
-              variant="secondary"
-              onClick={undefined}
-            >
-              <a href={`/api/receipts/${receipt.id}/pdf?inline=1`} target="_blank" rel="noopener noreferrer">
-                PDF
-              </a>
-            </Button>
-          </div>
-        }
+        actions={<ReceiptActions receiptId={receipt.id} />}
       />
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -124,6 +114,8 @@ export default async function ReceiptDetailPage({ params }: Props) {
               </div>
             </Card>
           )}
+
+          <EmailHistoryCard documentType="receipt" documentId={receipt.id} />
         </div>
       </div>
     </div>

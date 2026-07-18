@@ -1,50 +1,50 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
-import { generateInvoicePdf } from "@/lib/pdf/generate-invoice-pdf"
+import { generateReceiptPdf } from "@/lib/pdf/generate-receipt-pdf"
 import { sendAndLogEmail } from "@/lib/email/send-and-log"
 import { buildSubject, buildDefaultBodyText } from "@/lib/email/send-document-email"
 import { formatCurrency, formatDateJP } from "@/lib/format"
 
 type Params = { params: Promise<{ id: string }> }
-const DOCUMENT_TYPE = "invoice" as const
+const DOCUMENT_TYPE = "receipt" as const
 
-async function loadInvoice(id: string) {
-  return prisma.invoice.findUnique({
+async function loadReceipt(id: string) {
+  return prisma.receipt.findUnique({
     where: { id },
-    include: { customer: true, items: { orderBy: { sortOrder: "asc" } } },
+    include: { customer: true, invoice: true },
   })
 }
 
-type Invoice = NonNullable<Awaited<ReturnType<typeof loadInvoice>>>
+type Receipt = NonNullable<Awaited<ReturnType<typeof loadReceipt>>>
 
-function buildMetaRows(invoice: Invoice) {
+function buildMetaRows(receipt: Receipt) {
   return [
-    { label: "請求書番号", value: invoice.invoiceNumber },
-    { label: "ご請求金額", value: formatCurrency(invoice.totalAmount) },
-    { label: "お支払期限", value: formatDateJP(invoice.dueDate) },
+    { label: "領収書番号", value: receipt.receiptNumber },
+    { label: "領収金額", value: formatCurrency(receipt.totalAmount) },
+    { label: "発行日", value: formatDateJP(receipt.issueDate) },
   ]
 }
 
 // メールプレビュー（既定の宛先・件名・本文）を返す
 export async function GET(_request: Request, { params }: Params) {
   const { id } = await params
-  const invoice = await loadInvoice(id)
-  if (!invoice) {
-    return NextResponse.json({ error: "請求書が見つかりません" }, { status: 404 })
+  const receipt = await loadReceipt(id)
+  if (!receipt) {
+    return NextResponse.json({ error: "領収書が見つかりません" }, { status: 404 })
   }
 
   const company = await prisma.companyProfile.findFirst()
   const companyName = company?.name ?? ""
 
   return NextResponse.json({
-    to: invoice.customer.email ?? "",
-    subject: buildSubject(DOCUMENT_TYPE, invoice.invoiceNumber, companyName),
+    to: receipt.customer.email ?? "",
+    subject: buildSubject(DOCUMENT_TYPE, receipt.receiptNumber, companyName),
     body: buildDefaultBodyText({
       documentType: DOCUMENT_TYPE,
-      customerName: invoice.customer.name,
-      contactName: invoice.customer.staffName || invoice.customer.contactPerson,
+      customerName: receipt.customer.name,
+      contactName: receipt.customer.staffName || receipt.customer.contactPerson,
       companyName,
-      metaRows: buildMetaRows(invoice),
+      metaRows: buildMetaRows(receipt),
     }),
   })
 }
@@ -52,12 +52,12 @@ export async function GET(_request: Request, { params }: Params) {
 export async function POST(request: Request, { params }: Params) {
   const { id } = await params
 
-  const invoice = await loadInvoice(id)
-  if (!invoice) {
-    return NextResponse.json({ error: "請求書が見つかりません" }, { status: 404 })
+  const receipt = await loadReceipt(id)
+  if (!receipt) {
+    return NextResponse.json({ error: "領収書が見つかりません" }, { status: 404 })
   }
 
-  if (!invoice.customer.email) {
+  if (!receipt.customer.email) {
     return NextResponse.json(
       { error: "顧客のメールアドレスが設定されていません" },
       { status: 400 }
@@ -77,39 +77,33 @@ export async function POST(request: Request, { params }: Params) {
   }
 
   const payload = await request.json().catch(() => ({}))
-  const metaRows = buildMetaRows(invoice)
+  const metaRows = buildMetaRows(receipt)
   const subject =
     typeof payload.subject === "string" && payload.subject.trim()
       ? payload.subject
-      : buildSubject(DOCUMENT_TYPE, invoice.invoiceNumber, company.name)
+      : buildSubject(DOCUMENT_TYPE, receipt.receiptNumber, company.name)
   const bodyText =
     typeof payload.body === "string" && payload.body.trim()
       ? payload.body
       : buildDefaultBodyText({
           documentType: DOCUMENT_TYPE,
-          customerName: invoice.customer.name,
-          contactName: invoice.customer.staffName || invoice.customer.contactPerson,
+          customerName: receipt.customer.name,
+          contactName: receipt.customer.staffName || receipt.customer.contactPerson,
           companyName: company.name,
           metaRows,
         })
 
   try {
-    const pdfBuffer = await generateInvoicePdf(invoice, company)
+    const pdfBuffer = await generateReceiptPdf(receipt, company)
 
     await sendAndLogEmail({
       documentType: DOCUMENT_TYPE,
-      documentId: invoice.id,
-      documentNumber: invoice.invoiceNumber,
-      to: invoice.customer.email,
+      documentId: receipt.id,
+      documentNumber: receipt.receiptNumber,
+      to: receipt.customer.email,
       subject,
       bodyText,
       pdfBuffer,
-    })
-
-    // ステータスを送信済みに更新
-    await prisma.invoice.update({
-      where: { id },
-      data: { status: "sent", sentAt: new Date() },
     })
 
     return NextResponse.json({ success: true })

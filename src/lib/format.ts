@@ -9,6 +9,14 @@ export function formatDateJP(date: Date | string): string {
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`
 }
 
+/** 日時を日本語フォーマットで表示 (YYYY年MM月DD日 HH:MM) */
+export function formatDateTimeJP(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(date) : date
+  const hh = String(d.getHours()).padStart(2, "0")
+  const mm = String(d.getMinutes()).padStart(2, "0")
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${hh}:${mm}`
+}
+
 /** 日付をISO形式 (YYYY-MM-DD) に変換 */
 export function formatDateISO(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date

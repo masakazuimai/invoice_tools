@@ -28,7 +28,7 @@ export default async function CustomersPage() {
           <thead className="border-b bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left font-medium text-gray-500">顧客名</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">担当者</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-500">代表者</th>
               <th className="px-6 py-3 text-left font-medium text-gray-500">メール</th>
               <th className="px-6 py-3 text-left font-medium text-gray-500">請求書数</th>
               <th className="px-6 py-3 text-right font-medium text-gray-500">操作</th>

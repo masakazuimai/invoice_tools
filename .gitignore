@@ -51,3 +51,6 @@ public/fonts/*.ttf
 
 # uploaded images
 /uploads
+
+# バックアップスクリプトのログ
+scripts/backup.log

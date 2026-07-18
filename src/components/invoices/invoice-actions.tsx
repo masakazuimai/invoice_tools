@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { SendEmailButton } from "@/components/email/send-email-button"
 
 type Props = {
   invoiceId: string
@@ -23,18 +24,6 @@ export function InvoiceActions({ invoiceId, currentStatus, canDelete = true }: P
     })
     setLoading("")
     router.refresh()
-  }
-
-  const sendEmail = async () => {
-    setLoading("send")
-    const res = await fetch(`/api/invoices/${invoiceId}/send`, { method: "POST" })
-    if (res.ok) {
-      router.refresh()
-    } else {
-      const data = await res.json()
-      alert(data.error ?? "送信に失敗しました")
-    }
-    setLoading("")
   }
 
   const duplicate = async () => {
@@ -96,9 +85,7 @@ export function InvoiceActions({ invoiceId, currentStatus, canDelete = true }: P
 
       {currentStatus === "draft" && (
         <>
-          <Button onClick={sendEmail} disabled={loading === "send"}>
-            {loading === "send" ? "送信中..." : "メール送信"}
-          </Button>
+          <SendEmailButton endpoint={`/api/invoices/${invoiceId}/send`} />
           <Button variant="secondary" onClick={() => updateStatus("sent")} disabled={loading === "sent"}>
             送信済みにする
           </Button>

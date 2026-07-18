@@ -2,7 +2,9 @@ import { z } from "zod"
 
 export const bankInfoSchema = z.object({
   bankName: z.string().min(1, "銀行名は必須です"),
+  bankCode: z.string().regex(/^\d{4}$/, "金融機関コードは4桁の数字です").or(z.literal("")).optional(),
   branchName: z.string().min(1, "支店名は必須です"),
+  branchCode: z.string().regex(/^\d{3}$/, "支店コードは3桁の数字です").or(z.literal("")).optional(),
   accountType: z.enum(["普通", "当座"]),
   accountNumber: z.string().min(1, "口座番号は必須です"),
   accountHolder: z.string().min(1, "口座名義は必須です"),

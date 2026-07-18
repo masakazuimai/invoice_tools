@@ -275,7 +275,9 @@ export async function generateInvoicePdf(
   y += 14
   doc.font("Regular")
   const bankInfo: BankInfo = JSON.parse(company.bankInfo)
-  doc.text(`${bankInfo.bankName} ${bankInfo.branchName} ${bankInfo.accountType} ${bankInfo.accountNumber}`, leftX, y)
+  const bankLabel = bankInfo.bankCode ? `${bankInfo.bankName}（${bankInfo.bankCode}）` : bankInfo.bankName
+  const branchLabel = bankInfo.branchCode ? `${bankInfo.branchName}（${bankInfo.branchCode}）` : bankInfo.branchName
+  doc.text(`${bankLabel} ${branchLabel} ${bankInfo.accountType} ${bankInfo.accountNumber}`, leftX, y)
   y += 14
   doc.text(`口座名義: ${bankInfo.accountHolder}`, leftX, y)
   y += 25

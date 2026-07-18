@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { SendEmailButton } from "@/components/email/send-email-button"
 
 type Props = {
   quotationId: string
@@ -44,6 +45,8 @@ export function QuotationActions({ quotationId, currentStatus }: Props) {
       >
         PDF
       </Button>
+
+      <SendEmailButton endpoint={`/api/quotations/${quotationId}/send`} />
 
       {currentStatus === "draft" && (
         <Button variant="secondary" onClick={() => updateStatus("sent")} disabled={loading === "sent"}>
