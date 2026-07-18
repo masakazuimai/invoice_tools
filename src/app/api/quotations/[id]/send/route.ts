@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db"
 import { generateQuotationPdf } from "@/lib/pdf/generate-quotation-pdf"
 import { sendAndLogEmail } from "@/lib/email/send-and-log"
 import { buildSubject, buildDefaultBodyText } from "@/lib/email/send-document-email"
-import { formatCurrency, formatDateJP } from "@/lib/format"
+import { formatCurrency, formatDateJP, formatYearMonthJP } from "@/lib/format"
 
 type Params = { params: Promise<{ id: string }> }
 const DOCUMENT_TYPE = "quotation" as const
@@ -38,7 +38,7 @@ export async function GET(_request: Request, { params }: Params) {
 
   return NextResponse.json({
     to: quotation.customer.email ?? "",
-    subject: buildSubject(DOCUMENT_TYPE, quotation.quotationNumber, companyName),
+    subject: buildSubject(DOCUMENT_TYPE, formatYearMonthJP(quotation.issueDate), companyName),
     body: buildDefaultBodyText({
       documentType: DOCUMENT_TYPE,
       customerName: quotation.customer.name,
@@ -81,7 +81,7 @@ export async function POST(request: Request, { params }: Params) {
   const subject =
     typeof payload.subject === "string" && payload.subject.trim()
       ? payload.subject
-      : buildSubject(DOCUMENT_TYPE, quotation.quotationNumber, company.name)
+      : buildSubject(DOCUMENT_TYPE, formatYearMonthJP(quotation.issueDate), company.name)
   const bodyText =
     typeof payload.body === "string" && payload.body.trim()
       ? payload.body

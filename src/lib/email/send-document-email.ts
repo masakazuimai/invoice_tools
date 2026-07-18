@@ -9,24 +9,22 @@ export type DocumentType = "invoice" | "quotation" | "delivery-note" | "receipt"
 type MetaRow = { label: string; value: string }
 
 // 書類種別ごとの表示情報
-const DOCUMENT_LABELS: Record<
-  DocumentType,
-  { name: string; honorific: string; lead: string }
-> = {
-  invoice: { name: "請求書", honorific: "御中", lead: "下記の通り請求書をお送りいたします。" },
-  quotation: { name: "見積書", honorific: "御中", lead: "下記の通りお見積書をお送りいたします。" },
-  "delivery-note": { name: "納品書", honorific: "御中", lead: "下記の通り納品書をお送りいたします。" },
-  receipt: { name: "領収書", honorific: "様", lead: "下記の通り領収書をお送りいたします。" },
+const DOCUMENT_LABELS: Record<DocumentType, { name: string; lead: string }> = {
+  invoice: { name: "請求書", lead: "下記の通り請求書をお送りいたします。" },
+  quotation: { name: "見積書", lead: "下記の通りお見積書をお送りいたします。" },
+  "delivery-note": { name: "納品書", lead: "下記の通り納品書をお送りいたします。" },
+  receipt: { name: "領収書", lead: "下記の通り領収書をお送りいたします。" },
 }
 
 // メール件名を生成（送信履歴の記録・プレビューにも利用する）
+// period は対象月表記（例: 2026年7月分）
 export function buildSubject(
   documentType: DocumentType,
-  documentNumber: string,
+  period: string,
   companyName: string
 ): string {
   const { name } = DOCUMENT_LABELS[documentType]
-  return `【${name}】${documentNumber} - ${companyName}`
+  return `【${name}】${period} - ${companyName}`
 }
 
 type BuildBodyParams = {
@@ -45,13 +43,13 @@ export function buildDefaultBodyText({
   metaRows,
   contactName,
 }: BuildBodyParams): string {
-  const { name, honorific, lead } = DOCUMENT_LABELS[documentType]
+  const { name, lead } = DOCUMENT_LABELS[documentType]
   const metaLines = metaRows.map((row) => `${row.label}：${row.value}`).join("\n")
 
-  // 担当者名があれば「会社名／担当者 様」、無ければ「会社名 御中」
+  // 会社名（屋号）行は常に御中。担当者名があればその下に「担当者 様」を添える
   const addresseeLines = contactName
-    ? [customerName, `${contactName} 様`]
-    : [`${customerName} ${honorific}`]
+    ? [`${customerName} 御中`, `${contactName} 様`]
+    : [`${customerName} 御中`]
 
   return [
     ...addresseeLines,

@@ -9,6 +9,12 @@ export function formatDateJP(date: Date | string): string {
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`
 }
 
+/** 日付を「YYYY年M月分」形式で表示（メール件名などの対象月表記に使用） */
+export function formatYearMonthJP(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(date) : date
+  return `${d.getFullYear()}年${d.getMonth() + 1}月分`
+}
+
 /** 日時を日本語フォーマットで表示 (YYYY年MM月DD日 HH:MM) */
 export function formatDateTimeJP(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date

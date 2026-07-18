@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db"
 import { generateReceiptPdf } from "@/lib/pdf/generate-receipt-pdf"
 import { sendAndLogEmail } from "@/lib/email/send-and-log"
 import { buildSubject, buildDefaultBodyText } from "@/lib/email/send-document-email"
-import { formatCurrency, formatDateJP } from "@/lib/format"
+import { formatCurrency, formatDateJP, formatYearMonthJP } from "@/lib/format"
 
 type Params = { params: Promise<{ id: string }> }
 const DOCUMENT_TYPE = "receipt" as const
@@ -38,7 +38,7 @@ export async function GET(_request: Request, { params }: Params) {
 
   return NextResponse.json({
     to: receipt.customer.email ?? "",
-    subject: buildSubject(DOCUMENT_TYPE, receipt.receiptNumber, companyName),
+    subject: buildSubject(DOCUMENT_TYPE, formatYearMonthJP(receipt.issueDate), companyName),
     body: buildDefaultBodyText({
       documentType: DOCUMENT_TYPE,
       customerName: receipt.customer.name,
@@ -81,7 +81,7 @@ export async function POST(request: Request, { params }: Params) {
   const subject =
     typeof payload.subject === "string" && payload.subject.trim()
       ? payload.subject
-      : buildSubject(DOCUMENT_TYPE, receipt.receiptNumber, company.name)
+      : buildSubject(DOCUMENT_TYPE, formatYearMonthJP(receipt.issueDate), company.name)
   const bodyText =
     typeof payload.body === "string" && payload.body.trim()
       ? payload.body
