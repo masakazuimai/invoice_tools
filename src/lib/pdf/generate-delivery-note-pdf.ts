@@ -2,6 +2,7 @@ import PDFDocument from "pdfkit"
 import path from "path"
 import fs from "fs"
 import { formatCurrency, formatDateJP } from "@/lib/format"
+import { applyDefaultCharacterSpacing } from "@/lib/pdf/text-spacing"
 
 function resolveImagePath(url: string | null | undefined): string | null {
   if (!url) return null
@@ -77,39 +78,40 @@ export async function generateDeliveryNotePdf(
 
   doc.registerFont("Regular", fontRegular)
   doc.registerFont("Bold", fontBold)
+  applyDefaultCharacterSpacing(doc) // 全テキストに既定の字間を適用
   doc.font("Regular")
 
   let y = MARGIN.top
   const leftX = MARGIN.left
-  const rightX = PAGE.width - MARGIN.right - 200
+  const rightX = PAGE.width - MARGIN.right - 235
 
   // --- タイトル ---
-  doc.font("Bold").fontSize(22).text("納品書", leftX, y, { align: "center" })
-  y += 40
+  doc.font("Bold").fontSize(22).text("納品書", leftX, y, { align: "center", characterSpacing: 4 })
+  y += 70
 
   // --- 宛先 ---
   doc.font("Regular")
   if (note.customer.zipCode) {
-    doc.fontSize(9).text(`〒${note.customer.zipCode}`, leftX, y)
+    doc.fontSize(9.5).text(`〒${note.customer.zipCode}`, leftX, y)
     y += 14
   }
   if (note.customer.address) {
-    doc.fontSize(9).text(note.customer.address, leftX, y)
+    doc.fontSize(9.5).text(note.customer.address, leftX, y)
     y += 14
   }
   const customerY = y
-  doc.font("Bold").fontSize(14).text(`${note.customer.name} 御中`, leftX, y)
+  doc.font("Bold").fontSize(14).text(`${note.customer.name} 御中`, leftX, y, { characterSpacing: 0.5 })
   y += 22
   doc.font("Regular")
   if (note.customer.contactPerson) {
     const title = note.customer.contactTitle ? `${note.customer.contactTitle} ` : ""
-    doc.fontSize(9).text(`${title}${note.customer.contactPerson} 様`, leftX, y)
+    doc.fontSize(9.5).text(`${title}${note.customer.contactPerson} 様`, leftX, y)
     y += 14
   }
 
   // --- 納品書情報（右側）---
   let ry = customerY - 36
-  doc.fontSize(9)
+  doc.fontSize(9.5)
   doc.text(`納品書番号: ${note.deliveryNoteNumber}`, rightX, ry)
   ry += 14
   doc.text(`発行日: ${formatDateJP(note.issueDate)}`, rightX, ry)
@@ -118,14 +120,14 @@ export async function generateDeliveryNotePdf(
   ry += 20
 
   // --- 発行元情報 ---
-  doc.font("Bold").fontSize(9).text(company.name, rightX, ry)
+  doc.font("Bold").fontSize(9.5).text(company.name, rightX, ry)
   ry += 13
-  doc.font("Regular").fontSize(7.5)
-  doc.text(`〒${company.zipCode} ${company.address}`, rightX, ry)
+  doc.font("Regular").fontSize(8)
+  doc.text(`〒${company.zipCode} ${company.address}`, rightX, ry, { lineBreak: false })
   ry += 11
-  doc.text(`TEL: ${company.phone}  Email: ${company.email}`, rightX, ry)
+  doc.text(`TEL: ${company.phone}  Email: ${company.email}`, rightX, ry, { lineBreak: false })
   ry += 11
-  doc.text(`登録番号: ${company.invoiceRegNumber}`, rightX, ry)
+  doc.text(`登録番号: ${company.invoiceRegNumber}`, rightX, ry, { lineBreak: false })
   ry += 15
 
   // --- ロゴ・社判 ---
@@ -152,23 +154,59 @@ export async function generateDeliveryNotePdf(
   y = Math.max(y, ry + 10)
   y += 10
 
-  // --- 件名 ---
+  // --- 件名（背景バンド＋左アクセントバー）---
   if (note.subject) {
-    doc.font("Regular").fontSize(10).text(`件名: ${note.subject}`, leftX, y)
-    y += 18
+    const subjectLabelW = 32
+    doc.font("Bold").fontSize(11)
+    const subjectValueH = doc.heightOfString(note.subject, {
+      width: CONTENT_WIDTH - subjectLabelW - 34,
+    })
+    const subjectPadY = 9
+    const subjectBoxH = subjectPadY + subjectValueH + subjectPadY
+    doc.rect(leftX, y, CONTENT_WIDTH, subjectBoxH).fill("#f8fafc")
+    doc.rect(leftX, y, 3, subjectBoxH).fill("#334155") // 左アクセントバー
+    doc
+      .font("Regular")
+      .fontSize(8.5)
+      .fillColor("#64748b")
+      .text("件名", leftX + 16, y + subjectPadY + 3, { width: subjectLabelW, lineBreak: false })
+    doc
+      .font("Bold")
+      .fontSize(11)
+      .fillColor("#0f172a")
+      .text(note.subject, leftX + 16 + subjectLabelW, y + subjectPadY, {
+        width: CONTENT_WIDTH - subjectLabelW - 34,
+      })
+    doc.fillColor("#000000")
+    y += subjectBoxH + 16
   }
 
-  doc.fontSize(10).text("下記の通り納品いたします。", leftX, y)
-  y += 20
+  doc.font("Regular").fontSize(10).fillColor("#000000").text("下記の通り納品いたします。", leftX, y)
+  y += 32
 
-  doc.fontSize(9).text("合計金額（税込）", leftX, y)
-  y += 14
-  doc.font("Bold").fontSize(18).text(formatCurrency(note.totalAmount), leftX, y)
-  y += 30
-
-  // --- 罫線 ---
-  doc.strokeColor("#333333").moveTo(leftX, y).lineTo(PAGE.width - MARGIN.right, y).stroke()
-  y += 10
+  // 合計金額（強調ボックス）。行高を実測して上下パディングを対称にする
+  const amountBoxW = 320
+  doc.font("Regular").fontSize(9.5)
+  const amountLabelH = doc.currentLineHeight()
+  doc.font("Bold").fontSize(20)
+  const amountValueH = doc.currentLineHeight()
+  const amountPadY = 12
+  const amountGap = 2
+  const amountBoxH = amountPadY + amountLabelH + amountGap + amountValueH + amountPadY
+  doc.rect(leftX, y, amountBoxW, amountBoxH).fill("#f8fafc")
+  doc.rect(leftX, y, 4, amountBoxH).fill("#334155") // 左アクセントバー
+  doc
+    .font("Regular")
+    .fontSize(9.5)
+    .fillColor("#64748b")
+    .text("合計金額（税込）", leftX + 18, y + amountPadY, { characterSpacing: 0.5, lineBreak: false })
+  doc
+    .font("Bold")
+    .fontSize(20)
+    .fillColor("#0f172a")
+    .text(formatCurrency(note.totalAmount), leftX + 18, y + amountPadY + amountLabelH + amountGap, { lineBreak: false })
+  doc.font("Regular").fillColor("#000000")
+  y += amountBoxH + 20
 
   // --- 明細テーブル ---
   const cols = [
@@ -181,17 +219,21 @@ export async function generateDeliveryNotePdf(
     { label: "税率", width: 35, align: "center" as const },
   ]
 
-  doc.font("Bold").fontSize(8).fillColor("#444444")
+  // ヘッダー（背景帯）
+  doc.font("Bold").fontSize(8.5)
+  const headPadY = 5
+  const headBandH = headPadY + doc.currentLineHeight() + headPadY
+  doc.rect(leftX, y, CONTENT_WIDTH, headBandH).fill("#f1f5f9")
+  doc.fillColor("#334155")
   let cx = leftX
   for (const col of cols) {
-    doc.text(col.label, cx, y, { width: col.width, align: col.align })
+    doc.text(col.label, cx, y + headPadY, { width: col.width, align: col.align, lineBreak: false })
     cx += col.width
   }
-  y += 14
-  doc.moveTo(leftX, y).lineTo(PAGE.width - MARGIN.right, y).strokeColor("#cccccc").stroke()
-  y += 5
+  y += headBandH + 4
 
-  doc.font("Regular").fillColor("#000000").fontSize(9)
+  // 行（各行の下に薄い罫線）
+  doc.font("Regular").fillColor("#111111").fontSize(9.5)
   note.items.forEach((item, index) => {
     cx = leftX
     const rowData = [
@@ -207,7 +249,8 @@ export async function generateDeliveryNotePdf(
       doc.text(cell.text, cx, y, { width: cell.width, align: cell.align as "center" | "left" | "right" })
       cx += cell.width
     }
-    y += 16
+    y += 20
+    doc.moveTo(leftX, y - 5).lineTo(PAGE.width - MARGIN.right, y - 5).strokeColor("#e5e7eb").stroke()
   })
 
   y += 5
@@ -216,36 +259,48 @@ export async function generateDeliveryNotePdf(
 
   const has8 = note.taxAmount8 > 0
   if (has8) {
-    doc.fontSize(7).fillColor("#666666").text("※ 軽減税率（8%）対象", leftX, y)
+    doc.fontSize(8).fillColor("#666666").text("※ 軽減税率（8%）対象", leftX, y)
     y += 14
   }
 
   // --- 税額サマリー ---
   const summaryX = PAGE.width - MARGIN.right - 250
-  doc.font("Regular").fontSize(9).fillColor("#000000")
+  // 明細の税率列（中央揃えの「10%」）の右端と揃えるための右余白
+  const summaryRightInset = 8
+  const summaryW = 250 - summaryRightInset
+  doc.font("Regular").fontSize(9.5).fillColor("#000000")
 
   const subtotal10 = note.subtotal - (has8 ? Math.round(note.taxAmount8 / 0.08) : 0)
   const subtotal8 = has8 ? note.subtotal - subtotal10 : 0
 
   if (note.taxAmount10 > 0) {
-    doc.text(`10%対象  小計: ${formatCurrency(subtotal10)}   消費税: ${formatCurrency(note.taxAmount10)}`, summaryX, y, { width: 250, align: "right" })
-    y += 14
+    doc.text(`10%対象  小計: ${formatCurrency(subtotal10)}   消費税: ${formatCurrency(note.taxAmount10)}`, summaryX, y, { width: summaryW, align: "right" })
+    y += 22
   }
   if (has8) {
-    doc.text(`8%対象  小計: ${formatCurrency(subtotal8)}   消費税: ${formatCurrency(note.taxAmount8)}`, summaryX, y, { width: 250, align: "right" })
-    y += 14
+    doc.text(`8%対象  小計: ${formatCurrency(subtotal8)}   消費税: ${formatCurrency(note.taxAmount8)}`, summaryX, y, { width: summaryW, align: "right" })
+    y += 22
   }
 
-  y += 5
-  doc.moveTo(summaryX, y).lineTo(PAGE.width - MARGIN.right, y).strokeColor("#cccccc").stroke()
   y += 8
+  doc.moveTo(summaryX, y).lineTo(PAGE.width - MARGIN.right, y).strokeColor("#cccccc").stroke()
+  y += 14
 
-  doc.text(`小計（税抜）: ${formatCurrency(note.subtotal)}`, summaryX, y, { width: 250, align: "right" })
-  y += 14
-  doc.text(`消費税合計: ${formatCurrency(note.taxAmount10 + note.taxAmount8)}`, summaryX, y, { width: 250, align: "right" })
-  y += 14
-  doc.font("Bold").fontSize(13).text(`合計金額: ${formatCurrency(note.totalAmount)}`, summaryX, y, { width: 250, align: "right" })
-  y += 25
+  doc.text(`小計（税抜）: ${formatCurrency(note.subtotal)}`, summaryX, y, { width: summaryW, align: "right" })
+  y += 22
+  doc.text(`消費税合計: ${formatCurrency(note.taxAmount10 + note.taxAmount8)}`, summaryX, y, { width: summaryW, align: "right" })
+  y += 24
+
+  // 合計金額（背景帯）。字面がフォントサイズ分に収まるため行高との差を除いて帯を対称にする
+  const totalPadY = 6
+  const totalBandH = totalPadY + 14 + totalPadY
+  // 字面が描画基準より下に出るフォント特性に合わせ、帯を下げて文字を上下中央に収める（実測補正）
+  const totalBandY = y - totalPadY + 4.5
+  doc.rect(summaryX - 6, totalBandY, 256, totalBandH).fill("#f1f5f9")
+  doc.rect(summaryX - 6, totalBandY, 3, totalBandH).fill("#334155") // 左アクセントバー
+  doc.font("Bold").fontSize(14).fillColor("#0f172a").text(`合計金額: ${formatCurrency(note.totalAmount)}`, summaryX, y, { width: summaryW, align: "right", characterSpacing: 1, lineBreak: false })
+  doc.fillColor("#000000")
+  y += totalBandH - totalPadY + 14
 
   // --- 備考 ---
   doc.font("Regular")
@@ -254,7 +309,7 @@ export async function generateDeliveryNotePdf(
     y += 10
     doc.font("Bold").fontSize(8).fillColor("#444444").text("備考:", leftX, y)
     y += 12
-    doc.font("Regular").fontSize(9).fillColor("#000000").text(note.notes, leftX, y, { width: CONTENT_WIDTH })
+    doc.font("Regular").fontSize(9.5).fillColor("#000000").text(note.notes, leftX, y, { width: CONTENT_WIDTH })
   }
 
   doc.end()

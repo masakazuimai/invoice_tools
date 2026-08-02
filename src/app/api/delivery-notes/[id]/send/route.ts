@@ -17,6 +17,11 @@ async function loadDeliveryNote(id: string) {
 
 type DeliveryNote = NonNullable<Awaited<ReturnType<typeof loadDeliveryNote>>>
 
+// メール件名に使う表記。書類の件名を優先し、未入力なら対象月表記にする
+function buildSubjectTitle(deliveryNote: DeliveryNote) {
+  return deliveryNote.subject?.trim() || formatYearMonthJP(deliveryNote.issueDate)
+}
+
 function buildMetaRows(deliveryNote: DeliveryNote) {
   return [
     { label: "納品書番号", value: deliveryNote.deliveryNoteNumber },
@@ -38,7 +43,7 @@ export async function GET(_request: Request, { params }: Params) {
 
   return NextResponse.json({
     to: deliveryNote.customer.email ?? "",
-    subject: buildSubject(DOCUMENT_TYPE, formatYearMonthJP(deliveryNote.issueDate), companyName),
+    subject: buildSubject(DOCUMENT_TYPE, buildSubjectTitle(deliveryNote), companyName),
     body: buildDefaultBodyText({
       documentType: DOCUMENT_TYPE,
       customerName: deliveryNote.customer.name,
@@ -81,7 +86,7 @@ export async function POST(request: Request, { params }: Params) {
   const subject =
     typeof payload.subject === "string" && payload.subject.trim()
       ? payload.subject
-      : buildSubject(DOCUMENT_TYPE, formatYearMonthJP(deliveryNote.issueDate), company.name)
+      : buildSubject(DOCUMENT_TYPE, buildSubjectTitle(deliveryNote), company.name)
   const bodyText =
     typeof payload.body === "string" && payload.body.trim()
       ? payload.body

@@ -33,14 +33,14 @@ const DOCUMENT_LABELS: Record<DocumentType, { name: string; lead: string }> = {
 }
 
 // メール件名を生成（送信履歴の記録・プレビューにも利用する）
-// period は対象月表記（例: 2026年7月分）
+// title は書類の件名（未入力なら対象月表記。例: 2026年7月分）
 export function buildSubject(
   documentType: DocumentType,
-  period: string,
+  title: string,
   companyName: string
 ): string {
   const { name } = DOCUMENT_LABELS[documentType]
-  return `【${name}】${period} - ${companyName}`
+  return `【${name}】${title} - ${companyName}`
 }
 
 type BuildBodyParams = {

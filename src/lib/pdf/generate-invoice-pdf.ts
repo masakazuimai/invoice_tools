@@ -2,6 +2,7 @@ import PDFDocument from "pdfkit"
 import path from "path"
 import fs from "fs"
 import { formatCurrency, formatDateJP } from "@/lib/format"
+import { applyDefaultCharacterSpacing } from "@/lib/pdf/text-spacing"
 import type { BankInfo } from "@/schemas/settings.schema"
 
 function resolveImagePath(url: string | null | undefined): string | null {
@@ -33,6 +34,7 @@ type InvoiceData = {
     contactPerson?: string | null
     contactTitle?: string | null
   }
+  subject?: string | null
   items: InvoiceItem[]
   subtotal: number
   taxAmount10: number
@@ -81,17 +83,18 @@ export async function generateInvoicePdf(
   // 日本語フォント登録
   doc.registerFont("Regular", fontRegular)
   doc.registerFont("Bold", fontBold)
+  applyDefaultCharacterSpacing(doc) // 全テキストに既定の字間を適用
   doc.font("Regular")
 
   let y = MARGIN.top
 
   // --- タイトル ---
   doc.font("Bold").fontSize(22).text("請求書", MARGIN.left, y, { align: "center", characterSpacing: 4 })
-  y += 40
+  y += 70
 
   // --- 宛先（左側）と請求書情報（右側）---
   const leftX = MARGIN.left
-  const rightX = PAGE.width - MARGIN.right - 200
+  const rightX = PAGE.width - MARGIN.right - 235
 
   // 宛先
   doc.font("Regular")
@@ -127,11 +130,11 @@ export async function generateInvoicePdf(
   doc.font("Bold").fontSize(9.5).text(company.name, rightX, ry)
   ry += 13
   doc.font("Regular").fontSize(8)
-  doc.text(`〒${company.zipCode} ${company.address}`, rightX, ry)
+  doc.text(`〒${company.zipCode} ${company.address}`, rightX, ry, { lineBreak: false })
   ry += 11
-  doc.text(`TEL: ${company.phone}  Email: ${company.email}`, rightX, ry)
+  doc.text(`TEL: ${company.phone}  Email: ${company.email}`, rightX, ry, { lineBreak: false })
   ry += 11
-  doc.text(`登録番号: ${company.invoiceRegNumber}`, rightX, ry)
+  doc.text(`登録番号: ${company.invoiceRegNumber}`, rightX, ry, { lineBreak: false })
   ry += 15
 
   // --- ロゴ・社判（発行元情報の下）---
@@ -160,9 +163,36 @@ export async function generateInvoicePdf(
 
   y += 10
 
+  // --- 件名（背景バンド＋左アクセントバー）---
+  if (invoice.subject) {
+    const subjectLabelW = 32
+    doc.font("Bold").fontSize(11)
+    const subjectValueH = doc.heightOfString(invoice.subject, {
+      width: CONTENT_WIDTH - subjectLabelW - 34,
+    })
+    const subjectPadY = 9
+    const subjectBoxH = subjectPadY + subjectValueH + subjectPadY
+    doc.rect(leftX, y, CONTENT_WIDTH, subjectBoxH).fill("#f8fafc")
+    doc.rect(leftX, y, 3, subjectBoxH).fill("#334155") // 左アクセントバー
+    doc
+      .font("Regular")
+      .fontSize(8.5)
+      .fillColor("#64748b")
+      .text("件名", leftX + 16, y + subjectPadY + 3, { width: subjectLabelW, lineBreak: false })
+    doc
+      .font("Bold")
+      .fontSize(11)
+      .fillColor("#0f172a")
+      .text(invoice.subject, leftX + 16 + subjectLabelW, y + subjectPadY, {
+        width: CONTENT_WIDTH - subjectLabelW - 34,
+      })
+    doc.fillColor("#000000")
+    y += subjectBoxH + 16
+  }
+
   // --- ご請求金額（強調ボックス）---
   doc.font("Regular").fontSize(10).fillColor("#000000").text("下記の通りご請求申し上げます。", leftX, y)
-  y += 24
+  y += 32
 
   const amountBoxW = 320
   // 行高を実測してボックス高さを算出（上下パディング対称＝ビューア非依存で中央揃え）
@@ -269,8 +299,10 @@ export async function generateInvoicePdf(
   // 字面はフォントサイズ分に収まるため、行高との差（ディセント等）を除いて帯を対称にする
   const totalBandH = totalPadY + 14 + totalPadY
   // 字面が描画基準より下に出るフォント特性に合わせ、帯を下げて文字を上下中央に収める（実測補正）
-  doc.rect(summaryX - 6, y - totalPadY + 4.5, 256, totalBandH).fill("#f1f5f9")
-  doc.font("Bold").fontSize(14).fillColor("#0f172a").text(`合計金額: ${formatCurrency(invoice.totalAmount)}`, summaryX, y, { width: summaryW, align: "right", lineBreak: false })
+  const totalBandY = y - totalPadY + 4.5
+  doc.rect(summaryX - 6, totalBandY, 256, totalBandH).fill("#f1f5f9")
+  doc.rect(summaryX - 6, totalBandY, 3, totalBandH).fill("#334155") // 左アクセントバー
+  doc.font("Bold").fontSize(14).fillColor("#0f172a").text(`合計金額: ${formatCurrency(invoice.totalAmount)}`, summaryX, y, { width: summaryW, align: "right", characterSpacing: 1, lineBreak: false })
   doc.fillColor("#000000")
   y += totalBandH - totalPadY + 14
 

@@ -17,6 +17,11 @@ async function loadInvoice(id: string) {
 
 type Invoice = NonNullable<Awaited<ReturnType<typeof loadInvoice>>>
 
+// メール件名に使う表記。書類の件名を優先し、未入力なら対象月表記にする
+function buildSubjectTitle(invoice: Invoice) {
+  return invoice.subject?.trim() || formatYearMonthJP(invoice.issueDate)
+}
+
 function buildMetaRows(invoice: Invoice) {
   return [
     { label: "請求書番号", value: invoice.invoiceNumber },
@@ -38,7 +43,7 @@ export async function GET(_request: Request, { params }: Params) {
 
   return NextResponse.json({
     to: invoice.customer.email ?? "",
-    subject: buildSubject(DOCUMENT_TYPE, formatYearMonthJP(invoice.issueDate), companyName),
+    subject: buildSubject(DOCUMENT_TYPE, buildSubjectTitle(invoice), companyName),
     body: buildDefaultBodyText({
       documentType: DOCUMENT_TYPE,
       customerName: invoice.customer.name,
@@ -81,7 +86,7 @@ export async function POST(request: Request, { params }: Params) {
   const subject =
     typeof payload.subject === "string" && payload.subject.trim()
       ? payload.subject
-      : buildSubject(DOCUMENT_TYPE, formatYearMonthJP(invoice.issueDate), company.name)
+      : buildSubject(DOCUMENT_TYPE, buildSubjectTitle(invoice), company.name)
   const bodyText =
     typeof payload.body === "string" && payload.body.trim()
       ? payload.body

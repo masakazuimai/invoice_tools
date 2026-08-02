@@ -17,6 +17,11 @@ async function loadQuotation(id: string) {
 
 type Quotation = NonNullable<Awaited<ReturnType<typeof loadQuotation>>>
 
+// メール件名に使う表記。書類の件名を優先し、未入力なら対象月表記にする
+function buildSubjectTitle(quotation: Quotation) {
+  return quotation.subject?.trim() || formatYearMonthJP(quotation.issueDate)
+}
+
 function buildMetaRows(quotation: Quotation) {
   return [
     { label: "見積書番号", value: quotation.quotationNumber },
@@ -38,7 +43,7 @@ export async function GET(_request: Request, { params }: Params) {
 
   return NextResponse.json({
     to: quotation.customer.email ?? "",
-    subject: buildSubject(DOCUMENT_TYPE, formatYearMonthJP(quotation.issueDate), companyName),
+    subject: buildSubject(DOCUMENT_TYPE, buildSubjectTitle(quotation), companyName),
     body: buildDefaultBodyText({
       documentType: DOCUMENT_TYPE,
       customerName: quotation.customer.name,
@@ -81,7 +86,7 @@ export async function POST(request: Request, { params }: Params) {
   const subject =
     typeof payload.subject === "string" && payload.subject.trim()
       ? payload.subject
-      : buildSubject(DOCUMENT_TYPE, formatYearMonthJP(quotation.issueDate), company.name)
+      : buildSubject(DOCUMENT_TYPE, buildSubjectTitle(quotation), company.name)
   const bodyText =
     typeof payload.body === "string" && payload.body.trim()
       ? payload.body
