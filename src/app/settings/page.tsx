@@ -110,7 +110,7 @@ export default function SettingsPage() {
 
           <Card>
             <h2 className="mb-4 text-lg font-semibold">ロゴ・社判</h2>
-            <p className="mb-4 text-sm text-gray-500">PDFの右上（自社情報欄）に表示されます。PNG/JPEG/WebP、2MB以下。</p>
+            <p className="mb-4 text-base text-gray-500">PDFの右上（自社情報欄）に表示されます。PNG/JPEG/WebP、2MB以下。</p>
             <div className="grid gap-6 sm:grid-cols-2">
               <ImageUpload
                 label="ロゴ"
@@ -152,7 +152,7 @@ export default function SettingsPage() {
             <Button type="submit" disabled={saving}>
               {saving ? "保存中..." : "保存"}
             </Button>
-            {message && <span className="text-sm text-green-600">{message}</span>}
+            {message && <span className="text-base text-green-600">{message}</span>}
           </div>
         </div>
       </form>

@@ -84,7 +84,7 @@ export async function generateReceiptPdf(
 
   let y = MARGIN.top
   const leftX = MARGIN.left
-  const rightX = PAGE.width - MARGIN.right - 235
+  const rightX = PAGE.width - MARGIN.right - 200
 
   // --- タイトル ---
   doc.font("Bold").fontSize(22).text("領収書", leftX, y, { align: "center", characterSpacing: 4 })
@@ -118,7 +118,9 @@ export async function generateReceiptPdf(
   doc.font("Regular").fontSize(8)
   doc.text(`〒${company.zipCode} ${company.address}`, rightX, ry, { lineBreak: false })
   ry += 11
-  doc.text(`TEL: ${company.phone}  Email: ${company.email}`, rightX, ry, { lineBreak: false })
+  doc.text(`TEL: ${company.phone}`, rightX, ry, { lineBreak: false })
+  ry += 11
+  doc.text(`Email: ${company.email}`, rightX, ry, { lineBreak: false })
   ry += 11
   doc.text(`登録番号: ${company.invoiceRegNumber}`, rightX, ry, { lineBreak: false })
   ry += 15

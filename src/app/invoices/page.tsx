@@ -31,15 +31,15 @@ export default async function InvoicesPage() {
         }
       />
       <Card className="p-0 overflow-hidden">
-        <table className="w-full text-sm">
+        <table className="w-full text-base">
           <thead className="border-b bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">請求書番号</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">顧客</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">発行日</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">支払期限</th>
-              <th className="px-6 py-3 text-right font-medium text-gray-500">金額</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">ステータス</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">請求書番号</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">顧客</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">発行日</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">支払期限</th>
+              <th className="px-6 py-3 text-right font-medium text-gray-600">金額</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">ステータス</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -53,7 +53,7 @@ export default async function InvoicesPage() {
                 <td className="px-6 py-4 text-gray-900">{invoice.customer.name}</td>
                 <td className="px-6 py-4 text-gray-600">{formatDateJP(invoice.issueDate)}</td>
                 <td className="px-6 py-4 text-gray-600">{formatDateJP(invoice.dueDate)}</td>
-                <td className="px-6 py-4 text-right font-medium text-gray-900">
+                <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">
                   {formatCurrency(invoice.totalAmount)}
                 </td>
                 <td className="px-6 py-4">

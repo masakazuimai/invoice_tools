@@ -83,7 +83,7 @@ export async function generateQuotationPdf(
 
   let y = MARGIN.top
   const leftX = MARGIN.left
-  const rightX = PAGE.width - MARGIN.right - 235
+  const rightX = PAGE.width - MARGIN.right - 200
 
   // --- タイトル ---
   doc.font("Bold").fontSize(22).text("御見積書", leftX, y, { align: "center", characterSpacing: 4 })
@@ -125,7 +125,9 @@ export async function generateQuotationPdf(
   doc.font("Regular").fontSize(8)
   doc.text(`〒${company.zipCode} ${company.address}`, rightX, ry, { lineBreak: false })
   ry += 11
-  doc.text(`TEL: ${company.phone}  Email: ${company.email}`, rightX, ry, { lineBreak: false })
+  doc.text(`TEL: ${company.phone}`, rightX, ry, { lineBreak: false })
+  ry += 11
+  doc.text(`Email: ${company.email}`, rightX, ry, { lineBreak: false })
   ry += 11
   doc.text(`登録番号: ${company.invoiceRegNumber}`, rightX, ry, { lineBreak: false })
   ry += 15
@@ -250,7 +252,7 @@ export async function generateQuotationPdf(
       doc.text(cell.text, cx, y, { width: cell.width, align: cell.align as "center" | "left" | "right" })
       cx += cell.width
     }
-    y += 20
+    y += 24
     doc.moveTo(leftX, y - 5).lineTo(PAGE.width - MARGIN.right, y - 5).strokeColor("#e5e7eb").stroke()
   })
 

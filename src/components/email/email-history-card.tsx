@@ -19,7 +19,7 @@ export async function EmailHistoryCard({ documentType, documentId }: Props) {
   return (
     <Card>
       <h3 className="font-semibold mb-3">送信履歴</h3>
-      <ul className="space-y-3 text-sm">
+      <ul className="space-y-3 text-base">
         {logs.map((log) => (
           <li key={log.id} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
             <div className="flex items-center justify-between gap-2">
@@ -27,8 +27,8 @@ export async function EmailHistoryCard({ documentType, documentId }: Props) {
               <span
                 className={
                   log.status === "sent"
-                    ? "rounded px-2 py-0.5 text-xs bg-green-100 text-green-700"
-                    : "rounded px-2 py-0.5 text-xs bg-red-100 text-red-700"
+                    ? "rounded px-2 py-0.5 text-base bg-green-100 text-green-700"
+                    : "rounded px-2 py-0.5 text-base bg-red-100 text-red-700"
                 }
               >
                 {log.status === "sent" ? "送信成功" : "送信失敗"}

@@ -157,9 +157,9 @@ export function DeliveryNoteForm({ initialData }: Props) {
           <h2 className="text-lg font-semibold">明細</h2>
           <Button type="button" variant="secondary" size="sm" onClick={addItem}>行を追加</Button>
         </div>
-        {errors.items && <p className="mb-4 text-sm text-red-600">{errors.items}</p>}
+        {errors.items && <p className="mb-4 text-base text-red-600">{errors.items}</p>}
         <div className="space-y-3">
-          <div className="hidden sm:grid sm:grid-cols-12 sm:gap-2 text-xs font-medium text-gray-500 px-1">
+          <div className="hidden sm:grid sm:grid-cols-12 sm:gap-2 text-base font-medium text-gray-500 px-1">
             <div className="col-span-3">品目</div>
             <div className="col-span-2">品目マスタ</div>
             <div className="col-span-1">数量</div>
@@ -175,7 +175,7 @@ export function DeliveryNoteForm({ initialData }: Props) {
                 <Input value={item.name} onChange={(e) => updateItem(index, "name", e.target.value)} placeholder="品目名" />
               </div>
               <div className="col-span-6 sm:col-span-2">
-                <select className="block w-full rounded-md border border-gray-300 px-2 py-2 text-sm" value="" onChange={(e) => selectMasterItem(index, e.target.value)}>
+                <select className="block w-full rounded-md border border-gray-300 px-2 py-2 text-base" value="" onChange={(e) => selectMasterItem(index, e.target.value)}>
                   <option value="">マスタから選択</option>
                   {masterItems.map((m) => (<option key={m.id} value={m.id}>{m.name}</option>))}
                 </select>
@@ -190,24 +190,24 @@ export function DeliveryNoteForm({ initialData }: Props) {
                 <Input type="number" value={item.unitPrice} onChange={(e) => updateItem(index, "unitPrice", parseInt(e.target.value) || 0)} />
               </div>
               <div className="col-span-4 sm:col-span-1">
-                <select className="block w-full rounded-md border border-gray-300 px-2 py-2 text-sm" value={item.taxRate} onChange={(e) => updateItem(index, "taxRate", parseInt(e.target.value))}>
+                <select className="block w-full rounded-md border border-gray-300 px-2 py-2 text-base" value={item.taxRate} onChange={(e) => updateItem(index, "taxRate", parseInt(e.target.value))}>
                   <option value={10}>10%</option>
                   <option value={8}>8%</option>
                 </select>
               </div>
-              <div className="col-span-6 sm:col-span-1 flex items-center justify-end text-sm font-medium">
+              <div className="col-span-6 sm:col-span-1 flex items-center justify-end text-base font-medium">
                 {formatCurrency(calculateLineAmount(item.quantity, item.unitPrice))}
               </div>
               <div className="col-span-2 sm:col-span-1 flex items-center justify-end">
                 {items.length > 1 && (
-                  <button type="button" onClick={() => removeItem(index)} className="text-red-500 hover:text-red-700 text-sm">削除</button>
+                  <button type="button" onClick={() => removeItem(index)} className="text-red-500 hover:text-red-700 text-base">削除</button>
                 )}
               </div>
             </div>
           ))}
         </div>
         <div className="mt-6 border-t pt-4">
-          <div className="flex flex-col items-end gap-1 text-sm">
+          <div className="flex flex-col items-end gap-1 text-base">
             {taxSummary.subtotal10 > 0 && (
               <div className="flex gap-8">
                 <span className="text-gray-500">10%対象 小計:</span><span>{formatCurrency(taxSummary.subtotal10)}</span>

@@ -53,7 +53,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
             <div className="flex justify-between mb-6">
               <div>
                 <h2 className="text-xl font-bold">請求書</h2>
-                <p className="text-sm text-gray-500 mt-1">{invoice.invoiceNumber}</p>
+                <p className="text-base text-gray-500 mt-1">{invoice.invoiceNumber}</p>
               </div>
               <Badge className={statusColor(invoice.status)}>
                 {formatStatus(invoice.status)}
@@ -64,32 +64,32 @@ export default async function InvoiceDetailPage({ params }: Props) {
             <div className="mb-6">
               <p className="text-lg font-semibold">{invoice.customer.name} 御中</p>
               {invoice.customer.contactPerson && (
-                <p className="text-sm text-gray-600">{invoice.customer.contactTitle ? `${invoice.customer.contactTitle} ` : ""}{invoice.customer.contactPerson} 様</p>
+                <p className="text-base text-gray-600">{invoice.customer.contactTitle ? `${invoice.customer.contactTitle} ` : ""}{invoice.customer.contactPerson} 様</p>
               )}
               {invoice.customer.address && (
-                <p className="text-sm text-gray-500">{invoice.customer.address}</p>
+                <p className="text-base text-gray-500">{invoice.customer.address}</p>
               )}
             </div>
 
             {/* 件名 */}
             {invoice.subject && (
               <div className="mb-6">
-                <p className="text-sm text-gray-500">件名</p>
+                <p className="text-base text-gray-500">件名</p>
                 <p className="font-medium">{invoice.subject}</p>
               </div>
             )}
 
             {/* 明細テーブル */}
-            <table className="w-full text-sm mb-6">
+            <table className="w-full text-base mb-6">
               <thead className="border-b bg-gray-50">
                 <tr>
-                  <th className="px-4 py-2 text-left font-medium text-gray-500">No.</th>
-                  <th className="px-4 py-2 text-left font-medium text-gray-500">品目</th>
-                  <th className="px-4 py-2 text-right font-medium text-gray-500">数量</th>
-                  <th className="px-4 py-2 text-left font-medium text-gray-500">単位</th>
-                  <th className="px-4 py-2 text-right font-medium text-gray-500">単価</th>
-                  <th className="px-4 py-2 text-right font-medium text-gray-500">金額</th>
-                  <th className="px-4 py-2 text-center font-medium text-gray-500">税率</th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600">No.</th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600">品目</th>
+                  <th className="px-4 py-2 text-right font-medium text-gray-600">数量</th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600">単位</th>
+                  <th className="px-4 py-2 text-right font-medium text-gray-600">単価</th>
+                  <th className="px-4 py-2 text-right font-medium text-gray-600">金額</th>
+                  <th className="px-4 py-2 text-center font-medium text-gray-600">税率</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -111,11 +111,11 @@ export default async function InvoiceDetailPage({ params }: Props) {
 
             {/* 8%対象がある場合の注記 */}
             {invoice.taxAmount8 > 0 && (
-              <p className="text-xs text-gray-500 mb-4">※ 軽減税率（8%）対象</p>
+              <p className="text-base text-gray-500 mb-4">※ 軽減税率（8%）対象</p>
             )}
 
             {/* 合計 */}
-            <div className="flex flex-col items-end gap-1 text-sm">
+            <div className="flex flex-col items-end gap-1 text-base">
               {invoice.taxAmount10 > 0 && (
                 <div className="flex gap-6">
                   <span className="text-gray-500 w-40 text-right">10%対象 消費税:</span>
@@ -144,8 +144,8 @@ export default async function InvoiceDetailPage({ params }: Props) {
 
             {invoice.notes && (
               <div className="mt-6 border-t pt-4">
-                <h3 className="text-sm font-medium text-gray-500 mb-1">備考</h3>
-                <p className="text-sm whitespace-pre-wrap">{invoice.notes}</p>
+                <h3 className="text-base font-medium text-gray-500 mb-1">備考</h3>
+                <p className="text-base whitespace-pre-wrap">{invoice.notes}</p>
               </div>
             )}
           </Card>
@@ -155,7 +155,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
         <div className="space-y-6">
           <Card>
             <h3 className="font-semibold mb-3">詳細</h3>
-            <dl className="space-y-3 text-sm">
+            <dl className="space-y-3 text-base">
               <div>
                 <dt className="text-gray-500">発行日</dt>
                 <dd>{formatDateJP(invoice.issueDate)}</dd>
@@ -202,7 +202,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
           {profile && (
             <Card>
               <h3 className="font-semibold mb-3">発行元</h3>
-              <div className="text-sm space-y-1">
+              <div className="text-base space-y-1">
                 <p className="font-medium">{profile.name}</p>
                 <p className="text-gray-500">{profile.address}</p>
                 <p className="text-gray-500">TEL: {profile.phone}</p>

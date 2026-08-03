@@ -24,15 +24,15 @@ export default async function ReceiptsPage() {
         description={`${receipts.length}件の領収書`}
       />
       <Card className="p-0 overflow-hidden">
-        <table className="w-full text-sm">
+        <table className="w-full text-base">
           <thead className="border-b bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">領収書番号</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">顧客</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">対応請求書</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">発行日</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">支払方法</th>
-              <th className="px-6 py-3 text-right font-medium text-gray-500">金額</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">領収書番号</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">顧客</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">対応請求書</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">発行日</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">支払方法</th>
+              <th className="px-6 py-3 text-right font-medium text-gray-600">金額</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -51,7 +51,7 @@ export default async function ReceiptsPage() {
                 </td>
                 <td className="px-6 py-4 text-gray-600">{formatDateJP(r.issueDate)}</td>
                 <td className="px-6 py-4 text-gray-600">{formatPaymentMethod(r.paymentMethod)}</td>
-                <td className="px-6 py-4 text-right font-medium text-gray-900">
+                <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">
                   {formatCurrency(r.totalAmount)}
                 </td>
               </tr>

@@ -129,7 +129,7 @@ export default function GenerateInvoicePage() {
 
       {loading && (
         <Card>
-          <p className="text-sm text-gray-500">検索中...</p>
+          <p className="text-base text-gray-500">検索中...</p>
         </Card>
       )}
 
@@ -145,18 +145,18 @@ export default function GenerateInvoicePage() {
           </div>
 
           {deliveryNotes.length === 0 ? (
-            <p className="text-sm text-gray-500">
+            <p className="text-base text-gray-500">
               対象月の未請求（納品済み）の納品書がありません
             </p>
           ) : (
             <>
-              <table className="w-full text-sm mb-6">
+              <table className="w-full text-base mb-6">
                 <thead className="border-b bg-gray-50">
                   <tr>
-                    <th className="px-4 py-2 text-left font-medium text-gray-500">納品書番号</th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-500">件名</th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-500">納品日</th>
-                    <th className="px-4 py-2 text-right font-medium text-gray-500">金額（税込）</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">納品書番号</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">件名</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">納品日</th>
+                    <th className="px-4 py-2 text-right font-medium text-gray-600">金額（税込）</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">

@@ -197,9 +197,9 @@ export function QuotationForm({ initialData }: Props) {
             行を追加
           </Button>
         </div>
-        {errors.items && <p className="mb-4 text-sm text-red-600">{errors.items}</p>}
+        {errors.items && <p className="mb-4 text-base text-red-600">{errors.items}</p>}
         <div className="space-y-3">
-          <div className="hidden sm:grid sm:grid-cols-12 sm:gap-2 text-xs font-medium text-gray-500 px-1">
+          <div className="hidden sm:grid sm:grid-cols-12 sm:gap-2 text-base font-medium text-gray-500 px-1">
             <div className="col-span-3">品目</div>
             <div className="col-span-2">品目マスタ</div>
             <div className="col-span-1">数量</div>
@@ -221,7 +221,7 @@ export function QuotationForm({ initialData }: Props) {
               </div>
               <div className="col-span-6 sm:col-span-2">
                 <select
-                  className="block w-full rounded-md border border-gray-300 px-2 py-2 text-sm"
+                  className="block w-full rounded-md border border-gray-300 px-2 py-2 text-base"
                   value=""
                   onChange={(e) => selectMasterItem(index, e.target.value)}
                 >
@@ -254,7 +254,7 @@ export function QuotationForm({ initialData }: Props) {
               </div>
               <div className="col-span-4 sm:col-span-1">
                 <select
-                  className="block w-full rounded-md border border-gray-300 px-2 py-2 text-sm"
+                  className="block w-full rounded-md border border-gray-300 px-2 py-2 text-base"
                   value={item.taxRate}
                   onChange={(e) => updateItem(index, "taxRate", parseInt(e.target.value))}
                 >
@@ -262,7 +262,7 @@ export function QuotationForm({ initialData }: Props) {
                   <option value={8}>8%</option>
                 </select>
               </div>
-              <div className="col-span-6 sm:col-span-1 flex items-center justify-end text-sm font-medium">
+              <div className="col-span-6 sm:col-span-1 flex items-center justify-end text-base font-medium">
                 {formatCurrency(calculateLineAmount(item.quantity, item.unitPrice))}
               </div>
               <div className="col-span-2 sm:col-span-1 flex items-center justify-end">
@@ -270,7 +270,7 @@ export function QuotationForm({ initialData }: Props) {
                   <button
                     type="button"
                     onClick={() => removeItem(index)}
-                    className="text-red-500 hover:text-red-700 text-sm"
+                    className="text-red-500 hover:text-red-700 text-base"
                   >
                     削除
                   </button>
@@ -281,7 +281,7 @@ export function QuotationForm({ initialData }: Props) {
         </div>
 
         <div className="mt-6 border-t pt-4">
-          <div className="flex flex-col items-end gap-1 text-sm">
+          <div className="flex flex-col items-end gap-1 text-base">
             {taxSummary.subtotal10 > 0 && (
               <div className="flex gap-8">
                 <span className="text-gray-500">10%対象 小計:</span>

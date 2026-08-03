@@ -64,11 +64,11 @@ export default async function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
           <Card key={card.label}>
-            <p className="text-sm text-gray-500">{card.label}</p>
+            <p className="text-base text-gray-500">{card.label}</p>
             <p className={`mt-1 text-2xl font-bold ${card.color}`}>
               {card.count}件
             </p>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-base text-gray-600">
               {formatCurrency(card.total)}
             </p>
           </Card>
@@ -80,14 +80,14 @@ export default async function DashboardPage() {
         <div className="px-6 py-4 border-b bg-gray-50">
           <h2 className="font-semibold">最近の請求書</h2>
         </div>
-        <table className="w-full text-sm">
+        <table className="w-full text-base">
           <thead className="border-b">
             <tr>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">番号</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">顧客</th>
-              <th className="px-6 py-3 text-right font-medium text-gray-500">金額</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">期限</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">ステータス</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">番号</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">顧客</th>
+              <th className="px-6 py-3 text-right font-medium text-gray-600">金額</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">期限</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">ステータス</th>
             </tr>
           </thead>
           <tbody className="divide-y">

@@ -37,22 +37,22 @@ export default async function ReceiptDetailPage({ params }: Props) {
           <Card>
             <div className="mb-6">
               <h2 className="text-xl font-bold">領収書</h2>
-              <p className="text-sm text-gray-500 mt-1">{receipt.receiptNumber}</p>
+              <p className="text-base text-gray-500 mt-1">{receipt.receiptNumber}</p>
             </div>
 
             <div className="mb-6">
               <p className="text-lg font-semibold">{receipt.customer.name} 様</p>
               {receipt.customer.address && (
-                <p className="text-sm text-gray-500">{receipt.customer.address}</p>
+                <p className="text-base text-gray-500">{receipt.customer.address}</p>
               )}
             </div>
 
             <div className="border-t border-b py-6 my-6">
-              <p className="text-center text-sm text-gray-500 mb-2">領収金額</p>
+              <p className="text-center text-base text-gray-500 mb-2">領収金額</p>
               <p className="text-center text-3xl font-bold">{formatCurrency(receipt.totalAmount)}</p>
             </div>
 
-            <dl className="space-y-3 text-sm">
+            <dl className="space-y-3 text-base">
               <div className="flex gap-4">
                 <dt className="text-gray-500 w-24">但し書き</dt>
                 <dd>{receipt.subject ?? "-"}</dd>
@@ -77,8 +77,8 @@ export default async function ReceiptDetailPage({ params }: Props) {
 
             {receipt.notes && (
               <div className="mt-6 border-t pt-4">
-                <h3 className="text-sm font-medium text-gray-500 mb-1">備考</h3>
-                <p className="text-sm whitespace-pre-wrap">{receipt.notes}</p>
+                <h3 className="text-base font-medium text-gray-500 mb-1">備考</h3>
+                <p className="text-base whitespace-pre-wrap">{receipt.notes}</p>
               </div>
             )}
           </Card>
@@ -87,7 +87,7 @@ export default async function ReceiptDetailPage({ params }: Props) {
         <div className="space-y-6">
           <Card>
             <h3 className="font-semibold mb-3">詳細</h3>
-            <dl className="space-y-3 text-sm">
+            <dl className="space-y-3 text-base">
               <div>
                 <dt className="text-gray-500">発行日</dt>
                 <dd>{formatDateJP(receipt.issueDate)}</dd>
@@ -106,7 +106,7 @@ export default async function ReceiptDetailPage({ params }: Props) {
           {profile && (
             <Card>
               <h3 className="font-semibold mb-3">発行元</h3>
-              <div className="text-sm space-y-1">
+              <div className="text-base space-y-1">
                 <p className="font-medium">{profile.name}</p>
                 <p className="text-gray-500">{profile.address}</p>
                 <p className="text-gray-500">TEL: {profile.phone}</p>

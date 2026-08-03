@@ -6,11 +6,11 @@ import { usePathname } from "next/navigation"
 const navItems = [
   { href: "/dashboard", label: "ダッシュボード", icon: "📊" },
   { href: "/quotations", label: "見積書", icon: "📋" },
-  { href: "/delivery-notes", label: "納品書", icon: "📦" },
+  { href: "/delivery-notes", label: "納品書", icon: "🚚" },
   { href: "/invoices", label: "請求書", icon: "📄" },
   { href: "/receipts", label: "領収書", icon: "🧾" },
   { href: "/customers", label: "顧客", icon: "👥" },
-  { href: "/items", label: "品目", icon: "📦" },
+  { href: "/items", label: "品目", icon: "🏷️" },
   { href: "/settings", label: "設定", icon: "⚙️" },
 ] as const
 
@@ -29,7 +29,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium transition-colors ${
                 isActive
                   ? "bg-blue-50 text-blue-700"
                   : "text-gray-700 hover:bg-gray-100"

@@ -54,3 +54,4 @@ public/fonts/*.ttf
 
 # バックアップスクリプトのログ
 scripts/backup.log
+.playwright-mcp/

@@ -24,14 +24,14 @@ export default async function CustomersPage() {
         }
       />
       <Card className="p-0 overflow-hidden">
-        <table className="w-full text-sm">
+        <table className="w-full text-base">
           <thead className="border-b bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">顧客名</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">代表者</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">メール</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500">請求書数</th>
-              <th className="px-6 py-3 text-right font-medium text-gray-500">操作</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">顧客名</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">代表者</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">メール</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-600">請求書数</th>
+              <th className="px-6 py-3 text-right font-medium text-gray-600">操作</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -41,7 +41,7 @@ export default async function CustomersPage() {
                 <td className="px-6 py-4 text-gray-600">{customer.contactPerson ?? "-"}</td>
                 <td className="px-6 py-4 text-gray-600">{customer.email ?? "-"}</td>
                 <td className="px-6 py-4 text-gray-600">{customer._count.invoices}</td>
-                <td className="px-6 py-4 text-right">
+                <td className="px-6 py-4 text-right tabular-nums">
                   <Link href={`/customers/${customer.id}/edit`} className="text-blue-600 hover:text-blue-800">
                     編集
                   </Link>
