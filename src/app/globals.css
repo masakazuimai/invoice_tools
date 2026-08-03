@@ -5,4 +5,8 @@
   --text-fluid: clamp(1rem, 1.05vw, 1.0625rem);
   /* 一覧テーブルのセル左右余白。狭い画面では詰めて、意図しない改行を防ぐ */
   --spacing-cell: clamp(0.625rem, 0.95vw, 1.5rem);
+  /* ページ見出し。操作ボタンが多い詳細画面で窮屈にならないよう流体化する */
+  --text-page-title: clamp(1.25rem, 1.55vw, 1.5rem);
+  /* 本文エリアの外周余白。狭い画面では詰めてコンテンツ幅を稼ぐ */
+  --spacing-page: clamp(1rem, 1.5vw, 2rem);
 }

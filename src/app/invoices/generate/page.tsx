@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/layout/page-header"
 import { Card } from "@/components/ui/card"
 import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { formatCurrency, formatDateJP } from "@/lib/format"
+import { formatCurrency, formatDateShort } from "@/lib/format"
 
 type Customer = { id: string; name: string }
 type DeliveryNote = {
@@ -164,7 +164,7 @@ export default function GenerateInvoicePage() {
                     <tr key={dn.id}>
                       <td className="px-4 py-3 font-medium">{dn.deliveryNoteNumber}</td>
                       <td className="px-4 py-3 text-gray-600">{dn.subject ?? "-"}</td>
-                      <td className="px-4 py-3 text-gray-600">{formatDateJP(dn.deliveryDate)}</td>
+                      <td className="px-4 py-3 text-gray-600">{formatDateShort(dn.deliveryDate)}</td>
                       <td className="px-4 py-3 text-right font-medium">{formatCurrency(dn.totalAmount)}</td>
                     </tr>
                   ))}

@@ -2,7 +2,7 @@ import Link from "next/link"
 import { prisma } from "@/lib/db"
 import { PageHeader } from "@/components/layout/page-header"
 import { Card } from "@/components/ui/card"
-import { formatCurrency, formatDateJP } from "@/lib/format"
+import { formatCurrency, formatDateShort } from "@/lib/format"
 
 export const dynamic = "force-dynamic"
 
@@ -49,7 +49,7 @@ export default async function ReceiptsPage() {
                     {r.invoice.invoiceNumber}
                   </Link>
                 </td>
-                <td className="whitespace-nowrap px-cell py-4 text-gray-600">{formatDateJP(r.issueDate)}</td>
+                <td className="whitespace-nowrap px-cell py-4 text-gray-600">{formatDateShort(r.issueDate)}</td>
                 <td className="px-cell py-4 text-gray-600">{formatPaymentMethod(r.paymentMethod)}</td>
                 <td className="whitespace-nowrap px-cell py-4 text-right font-medium text-gray-900 tabular-nums">
                   {formatCurrency(r.totalAmount)}

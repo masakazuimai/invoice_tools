@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/page-header"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { formatCurrency, formatDateJP, formatStatus, statusColor } from "@/lib/format"
+import { formatCurrency, formatDateShort, formatStatus, statusColor } from "@/lib/format"
 
 export const dynamic = "force-dynamic"
 
@@ -51,8 +51,8 @@ export default async function InvoicesPage() {
                   </Link>
                 </td>
                 <td className="px-cell py-4 text-gray-900">{invoice.customer.name}</td>
-                <td className="whitespace-nowrap px-cell py-4 text-gray-600">{formatDateJP(invoice.issueDate)}</td>
-                <td className="whitespace-nowrap px-cell py-4 text-gray-600">{formatDateJP(invoice.dueDate)}</td>
+                <td className="whitespace-nowrap px-cell py-4 text-gray-600">{formatDateShort(invoice.issueDate)}</td>
+                <td className="whitespace-nowrap px-cell py-4 text-gray-600">{formatDateShort(invoice.dueDate)}</td>
                 <td className="whitespace-nowrap px-cell py-4 text-right font-medium text-gray-900 tabular-nums">
                   {formatCurrency(invoice.totalAmount)}
                 </td>

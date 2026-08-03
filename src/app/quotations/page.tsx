@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/page-header"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { formatCurrency, formatDateJP, formatStatus, statusColor } from "@/lib/format"
+import { formatCurrency, formatDateShort, formatStatus, statusColor } from "@/lib/format"
 
 export const dynamic = "force-dynamic"
 
@@ -48,8 +48,8 @@ export default async function QuotationsPage() {
                 </td>
                 <td className="px-cell py-4 text-gray-900">{q.customer.name}</td>
                 <td className="px-cell py-4 text-gray-600">{q.subject ?? "-"}</td>
-                <td className="whitespace-nowrap px-cell py-4 text-gray-600">{formatDateJP(q.issueDate)}</td>
-                <td className="whitespace-nowrap px-cell py-4 text-gray-600">{formatDateJP(q.validUntil)}</td>
+                <td className="whitespace-nowrap px-cell py-4 text-gray-600">{formatDateShort(q.issueDate)}</td>
+                <td className="whitespace-nowrap px-cell py-4 text-gray-600">{formatDateShort(q.validUntil)}</td>
                 <td className="whitespace-nowrap px-cell py-4 text-right font-medium text-gray-900 tabular-nums">
                   {formatCurrency(q.totalAmount)}
                 </td>

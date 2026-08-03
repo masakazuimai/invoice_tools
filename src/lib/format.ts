@@ -9,6 +9,14 @@ export function formatDateJP(date: Date | string): string {
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`
 }
 
+/** 日付を短縮形式で表示 (YYYY/MM/DD)。列数の多い一覧テーブルで横幅を抑えるために使う */
+export function formatDateShort(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(date) : date
+  const mm = String(d.getMonth() + 1).padStart(2, "0")
+  const dd = String(d.getDate()).padStart(2, "0")
+  return `${d.getFullYear()}/${mm}/${dd}`
+}
+
 /** 日付を「YYYY年M月分」形式で表示（メール件名などの対象月表記に使用） */
 export function formatYearMonthJP(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date
