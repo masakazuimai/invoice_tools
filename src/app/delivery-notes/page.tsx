@@ -25,33 +25,33 @@ export default async function DeliveryNotesPage() {
           </Link>
         }
       />
-      <Card className="p-0 overflow-hidden">
-        <table className="w-full text-base">
+      <Card className="p-0 overflow-x-auto">
+        <table className="w-full min-w-max text-fluid">
           <thead className="border-b bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left font-medium text-gray-600">納品書番号</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-600">顧客</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-600">件名</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-600">納品日</th>
-              <th className="px-6 py-3 text-right font-medium text-gray-600">金額</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-600">ステータス</th>
+              <th className="whitespace-nowrap px-cell py-3 text-left font-medium text-gray-600">納品書番号</th>
+              <th className="whitespace-nowrap px-cell py-3 text-left font-medium text-gray-600">顧客</th>
+              <th className="whitespace-nowrap px-cell py-3 text-left font-medium text-gray-600">件名</th>
+              <th className="whitespace-nowrap px-cell py-3 text-left font-medium text-gray-600">納品日</th>
+              <th className="whitespace-nowrap px-cell py-3 text-right font-medium text-gray-600">金額</th>
+              <th className="whitespace-nowrap px-cell py-3 text-left font-medium text-gray-600">ステータス</th>
             </tr>
           </thead>
           <tbody className="divide-y">
             {deliveryNotes.map((dn) => (
               <tr key={dn.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4">
+                <td className="whitespace-nowrap px-cell py-4">
                   <Link href={`/delivery-notes/${dn.id}`} className="font-medium text-blue-600 hover:text-blue-800">
                     {dn.deliveryNoteNumber}
                   </Link>
                 </td>
-                <td className="px-6 py-4 text-gray-900">{dn.customer.name}</td>
-                <td className="px-6 py-4 text-gray-600">{dn.subject ?? "-"}</td>
-                <td className="px-6 py-4 text-gray-600">{formatDateJP(dn.deliveryDate)}</td>
-                <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">
+                <td className="px-cell py-4 text-gray-900">{dn.customer.name}</td>
+                <td className="px-cell py-4 text-gray-600">{dn.subject ?? "-"}</td>
+                <td className="whitespace-nowrap px-cell py-4 text-gray-600">{formatDateJP(dn.deliveryDate)}</td>
+                <td className="whitespace-nowrap px-cell py-4 text-right font-medium text-gray-900 tabular-nums">
                   {formatCurrency(dn.totalAmount)}
                 </td>
-                <td className="px-6 py-4 flex gap-2">
+                <td className="px-cell py-4 flex gap-2">
                   <Badge className={statusColor(dn.status)}>
                     {formatStatus(dn.status)}
                   </Badge>

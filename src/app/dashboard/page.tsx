@@ -76,32 +76,32 @@ export default async function DashboardPage() {
       </div>
 
       {/* 最近の請求書 */}
-      <Card className="p-0 overflow-hidden">
-        <div className="px-6 py-4 border-b bg-gray-50">
+      <Card className="p-0 overflow-x-auto">
+        <div className="px-cell py-4 border-b bg-gray-50">
           <h2 className="font-semibold">最近の請求書</h2>
         </div>
-        <table className="w-full text-base">
+        <table className="w-full min-w-max text-fluid">
           <thead className="border-b">
             <tr>
-              <th className="px-6 py-3 text-left font-medium text-gray-600">番号</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-600">顧客</th>
-              <th className="px-6 py-3 text-right font-medium text-gray-600">金額</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-600">期限</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-600">ステータス</th>
+              <th className="whitespace-nowrap px-cell py-3 text-left font-medium text-gray-600">番号</th>
+              <th className="whitespace-nowrap px-cell py-3 text-left font-medium text-gray-600">顧客</th>
+              <th className="whitespace-nowrap px-cell py-3 text-right font-medium text-gray-600">金額</th>
+              <th className="whitespace-nowrap px-cell py-3 text-left font-medium text-gray-600">期限</th>
+              <th className="whitespace-nowrap px-cell py-3 text-left font-medium text-gray-600">ステータス</th>
             </tr>
           </thead>
           <tbody className="divide-y">
             {invoices.map((inv) => (
               <tr key={inv.id} className="hover:bg-gray-50">
-                <td className="px-6 py-3">
+                <td className="px-cell py-3">
                   <Link href={`/invoices/${inv.id}`} className="text-blue-600 hover:text-blue-800">
                     {inv.invoiceNumber}
                   </Link>
                 </td>
-                <td className="px-6 py-3">{inv.customer.name}</td>
-                <td className="px-6 py-3 text-right font-medium">{formatCurrency(inv.totalAmount)}</td>
-                <td className="px-6 py-3 text-gray-600">{formatDateJP(inv.dueDate)}</td>
-                <td className="px-6 py-3">
+                <td className="px-cell py-3">{inv.customer.name}</td>
+                <td className="px-cell py-3 text-right font-medium">{formatCurrency(inv.totalAmount)}</td>
+                <td className="px-cell py-3 text-gray-600">{formatDateJP(inv.dueDate)}</td>
+                <td className="px-cell py-3">
                   <Badge className={statusColor(inv.status)}>
                     {formatStatus(inv.status)}
                   </Badge>

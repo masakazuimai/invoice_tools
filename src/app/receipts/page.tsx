@@ -23,35 +23,35 @@ export default async function ReceiptsPage() {
         title="領収書一覧"
         description={`${receipts.length}件の領収書`}
       />
-      <Card className="p-0 overflow-hidden">
-        <table className="w-full text-base">
+      <Card className="p-0 overflow-x-auto">
+        <table className="w-full min-w-max text-fluid">
           <thead className="border-b bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left font-medium text-gray-600">領収書番号</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-600">顧客</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-600">対応請求書</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-600">発行日</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-600">支払方法</th>
-              <th className="px-6 py-3 text-right font-medium text-gray-600">金額</th>
+              <th className="whitespace-nowrap px-cell py-3 text-left font-medium text-gray-600">領収書番号</th>
+              <th className="whitespace-nowrap px-cell py-3 text-left font-medium text-gray-600">顧客</th>
+              <th className="whitespace-nowrap px-cell py-3 text-left font-medium text-gray-600">対応請求書</th>
+              <th className="whitespace-nowrap px-cell py-3 text-left font-medium text-gray-600">発行日</th>
+              <th className="whitespace-nowrap px-cell py-3 text-left font-medium text-gray-600">支払方法</th>
+              <th className="whitespace-nowrap px-cell py-3 text-right font-medium text-gray-600">金額</th>
             </tr>
           </thead>
           <tbody className="divide-y">
             {receipts.map((r) => (
               <tr key={r.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4">
+                <td className="whitespace-nowrap px-cell py-4">
                   <Link href={`/receipts/${r.id}`} className="font-medium text-blue-600 hover:text-blue-800">
                     {r.receiptNumber}
                   </Link>
                 </td>
-                <td className="px-6 py-4 text-gray-900">{r.customer.name}</td>
-                <td className="px-6 py-4">
+                <td className="px-cell py-4 text-gray-900">{r.customer.name}</td>
+                <td className="whitespace-nowrap px-cell py-4">
                   <Link href={`/invoices/${r.invoiceId}`} className="text-blue-600 hover:text-blue-800">
                     {r.invoice.invoiceNumber}
                   </Link>
                 </td>
-                <td className="px-6 py-4 text-gray-600">{formatDateJP(r.issueDate)}</td>
-                <td className="px-6 py-4 text-gray-600">{formatPaymentMethod(r.paymentMethod)}</td>
-                <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">
+                <td className="whitespace-nowrap px-cell py-4 text-gray-600">{formatDateJP(r.issueDate)}</td>
+                <td className="px-cell py-4 text-gray-600">{formatPaymentMethod(r.paymentMethod)}</td>
+                <td className="whitespace-nowrap px-cell py-4 text-right font-medium text-gray-900 tabular-nums">
                   {formatCurrency(r.totalAmount)}
                 </td>
               </tr>

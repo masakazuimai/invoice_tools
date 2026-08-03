@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+@theme {
+  /* 一覧テーブル用の流体フォントサイズ。最小は16px（コーディング規約の下限） */
+  --text-fluid: clamp(1rem, 1.05vw, 1.0625rem);
+  /* 一覧テーブルのセル左右余白。狭い画面では詰めて、意図しない改行を防ぐ */
+  --spacing-cell: clamp(0.625rem, 0.95vw, 1.5rem);
+}
