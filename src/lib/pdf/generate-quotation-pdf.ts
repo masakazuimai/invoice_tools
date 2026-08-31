@@ -3,6 +3,7 @@ import path from "path"
 import fs from "fs"
 import { formatCurrency, formatDateJP } from "@/lib/format"
 import { applyDefaultCharacterSpacing } from "@/lib/pdf/text-spacing"
+import { drawCustomerAddress } from "@/lib/pdf/draw-customer-address"
 
 function resolveImagePath(url: string | null | undefined): string | null {
   if (!url) return null
@@ -29,6 +30,7 @@ type QuotationData = {
     name: string
     zipCode?: string | null
     address?: string | null
+    address2?: string | null
     contactPerson?: string | null
     contactTitle?: string | null
   }
@@ -90,16 +92,7 @@ export async function generateQuotationPdf(
   y += 70
 
   // --- 宛先（左側）---
-  doc.font("Regular")
-  if (quotation.customer.zipCode) {
-    doc.fontSize(9.5).text(`〒${quotation.customer.zipCode}`, leftX, y)
-    y += 14
-  }
-  if (quotation.customer.address) {
-    doc.fontSize(9.5).text(quotation.customer.address, leftX, y)
-    y += 14
-  }
-  const customerY = y
+  const addresseeTopY = y
   doc.font("Bold").fontSize(14).text(`${quotation.customer.name} 御中`, leftX, y, { characterSpacing: 0.5 })
   y += 22
   doc.font("Regular")
@@ -108,9 +101,16 @@ export async function generateQuotationPdf(
     doc.fontSize(9.5).text(`${title}${quotation.customer.contactPerson} 様`, leftX, y)
     y += 14
   }
+  y += 4.8 // 宛名と住所の間の余白（0.3rem）
+  // 郵便番号・住所1・住所2（右カラムに被らない幅で折り返す）
+  y = drawCustomerAddress(doc, quotation.customer, {
+    x: leftX,
+    y,
+    width: rightX - leftX - 12,
+  })
 
   // --- 見積書情報（右側）---
-  let ry = customerY - 36
+  let ry = addresseeTopY - 8
   doc.fontSize(9.5)
   doc.text(`見積書番号: ${quotation.quotationNumber}`, rightX, ry)
   ry += 14

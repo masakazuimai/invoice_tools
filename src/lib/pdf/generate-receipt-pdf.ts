@@ -3,6 +3,7 @@ import path from "path"
 import fs from "fs"
 import { formatCurrency, formatDateJP } from "@/lib/format"
 import { applyDefaultCharacterSpacing } from "@/lib/pdf/text-spacing"
+import { drawCustomerAddress } from "@/lib/pdf/draw-customer-address"
 
 function resolveImagePath(url: string | null | undefined): string | null {
   if (!url) return null
@@ -25,6 +26,7 @@ type ReceiptData = {
     name: string
     zipCode?: string | null
     address?: string | null
+    address2?: string | null
     contactPerson?: string | null
     contactTitle?: string | null
   }
@@ -91,21 +93,20 @@ export async function generateReceiptPdf(
   y += 70
 
   // --- 宛先 ---
-  doc.font("Regular")
-  if (receipt.customer.zipCode) {
-    doc.fontSize(9.5).text(`〒${receipt.customer.zipCode}`, leftX, y)
-    y += 14
-  }
-  if (receipt.customer.address) {
-    doc.fontSize(9.5).text(receipt.customer.address, leftX, y)
-    y += 14
-  }
-  const customerY = y
+  const addresseeTopY = y
   doc.font("Bold").fontSize(14).text(`${receipt.customer.name} 様`, leftX, y, { characterSpacing: 0.5 })
-  y += 30
+  y += 22
+  y += 4.8 // 宛名と住所の間の余白（0.3rem）
+  // 郵便番号・住所1・住所2（右カラムに被らない幅で折り返す）
+  y = drawCustomerAddress(doc, receipt.customer, {
+    x: leftX,
+    y,
+    width: rightX - leftX - 12,
+  })
+  y += 8
 
   // --- 領収書情報（右側）---
-  let ry = customerY - 36
+  let ry = addresseeTopY - 8
   doc.font("Regular").fontSize(9.5)
   doc.text(`領収書番号: ${receipt.receiptNumber}`, rightX, ry)
   ry += 14

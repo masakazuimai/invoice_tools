@@ -16,6 +16,7 @@ const defaultData: CustomerInput = {
   name: "",
   zipCode: "",
   address: "",
+  address2: "",
   phone: "",
   email: "",
   contactPerson: "",
@@ -87,7 +88,10 @@ export function CustomerForm({ initialData }: Props) {
           <Input label="電話番号" value={form.phone ?? ""} onChange={(e) => updateField("phone", e.target.value)} />
           <Input label="郵便番号" value={form.zipCode ?? ""} onChange={(e) => updateField("zipCode", e.target.value)} />
           <div className="sm:col-span-2">
-            <Input label="住所" value={form.address ?? ""} onChange={(e) => updateField("address", e.target.value)} />
+            <Input label="住所1" value={form.address ?? ""} onChange={(e) => updateField("address", e.target.value)} placeholder="都道府県〜番地" />
+          </div>
+          <div className="sm:col-span-2">
+            <Input label="住所2" value={form.address2 ?? ""} onChange={(e) => updateField("address2", e.target.value)} placeholder="建物名・部屋番号（任意）" />
           </div>
           <div className="sm:col-span-2">
             <Textarea label="メモ" value={form.memo ?? ""} onChange={(e) => updateField("memo", e.target.value)} rows={3} />

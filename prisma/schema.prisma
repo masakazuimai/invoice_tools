@@ -44,7 +44,8 @@ model Customer {
   id            String    @id @default(cuid())
   name          String // 顧客名（会社名）
   zipCode       String?
-  address       String?
+  address       String? // 住所1（都道府県〜番地）
+  address2      String? // 住所2（建物名・部屋番号）
   phone         String?
   email         String?
   contactPerson String? // 代表者名（請求書等に記載）

@@ -66,6 +66,9 @@ export default async function QuotationDetailPage({ params }: Props) {
               {quotation.customer.address && (
                 <p className="text-base text-gray-500">{quotation.customer.address}</p>
               )}
+              {quotation.customer.address2 && (
+                <p className="text-base text-gray-500">{quotation.customer.address2}</p>
+              )}
             </div>
 
             {/* 件名 */}

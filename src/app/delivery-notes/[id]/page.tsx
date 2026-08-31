@@ -65,6 +65,9 @@ export default async function DeliveryNoteDetailPage({ params }: Props) {
               {deliveryNote.customer.address && (
                 <p className="text-base text-gray-500">{deliveryNote.customer.address}</p>
               )}
+              {deliveryNote.customer.address2 && (
+                <p className="text-base text-gray-500">{deliveryNote.customer.address2}</p>
+              )}
             </div>
 
             {deliveryNote.subject && (

@@ -69,6 +69,9 @@ export default async function InvoiceDetailPage({ params }: Props) {
               {invoice.customer.address && (
                 <p className="text-base text-gray-500">{invoice.customer.address}</p>
               )}
+              {invoice.customer.address2 && (
+                <p className="text-base text-gray-500">{invoice.customer.address2}</p>
+              )}
             </div>
 
             {/* 件名 */}

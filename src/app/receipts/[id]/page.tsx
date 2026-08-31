@@ -45,6 +45,9 @@ export default async function ReceiptDetailPage({ params }: Props) {
               {receipt.customer.address && (
                 <p className="text-base text-gray-500">{receipt.customer.address}</p>
               )}
+              {receipt.customer.address2 && (
+                <p className="text-base text-gray-500">{receipt.customer.address2}</p>
+              )}
             </div>
 
             <div className="border-t border-b py-6 my-6">

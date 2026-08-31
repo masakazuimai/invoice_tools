@@ -20,6 +20,7 @@ export default async function EditCustomerPage({ params }: Props) {
           name: customer.name,
           zipCode: customer.zipCode ?? "",
           address: customer.address ?? "",
+          address2: customer.address2 ?? "",
           phone: customer.phone ?? "",
           email: customer.email ?? "",
           contactPerson: customer.contactPerson ?? "",
