@@ -8,6 +8,7 @@ import { Select } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/lib/format"
+import { stripLeadingZeros } from "@/lib/strip-leading-zeros"
 import { calculateTaxSummary, calculateLineAmount } from "@/lib/tax-calculator"
 import type { TaxRate } from "@/lib/tax-calculator"
 import type { DeliveryNoteItemInput } from "@/schemas/delivery-note.schema"
@@ -187,7 +188,7 @@ export function DeliveryNoteForm({ initialData }: Props) {
                 <Input value={item.unit} onChange={(e) => updateItem(index, "unit", e.target.value)} />
               </div>
               <div className="col-span-6 sm:col-span-2">
-                <Input type="number" value={item.unitPrice} onChange={(e) => updateItem(index, "unitPrice", parseInt(e.target.value) || 0)} />
+                <Input type="number" value={item.unitPrice} onChange={(e) => updateItem(index, "unitPrice", parseInt(e.target.value) || 0)} onBlur={stripLeadingZeros} />
               </div>
               <div className="col-span-4 sm:col-span-1">
                 <select className="block w-full rounded-md border border-gray-300 px-2 py-2 text-base" value={item.taxRate} onChange={(e) => updateItem(index, "taxRate", parseInt(e.target.value))}>

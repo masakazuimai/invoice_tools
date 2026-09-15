@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
+import { stripLeadingZeros } from "@/lib/strip-leading-zeros"
 import type { ItemInput } from "@/schemas/item.schema"
 
 type Props = {
@@ -79,6 +80,7 @@ export function ItemForm({ initialData }: Props) {
             type="number"
             value={form.unitPrice}
             onChange={(e) => updateField("unitPrice", parseInt(e.target.value) || 0)}
+            onBlur={stripLeadingZeros}
             error={errors.unitPrice}
           />
           <Input label="単位" value={form.unit} onChange={(e) => updateField("unit", e.target.value)} error={errors.unit} />

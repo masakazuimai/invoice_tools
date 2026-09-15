@@ -251,7 +251,9 @@ export async function generateDeliveryNotePdf(
       doc.text(cell.text, cx, y, { width: cell.width, align: cell.align as "center" | "left" | "right" })
       cx += cell.width
     }
-    y += 24
+    // 品目名などが折り返した場合は、増えた行数分だけ行の高さを広げる
+    const cellH = Math.max(...rowData.map((cell) => doc.heightOfString(cell.text, { width: cell.width })))
+    y += 24 + Math.max(0, cellH - doc.currentLineHeight(true))
     doc.moveTo(leftX, y - 5).lineTo(PAGE.width - MARGIN.right, y - 5).strokeColor("#e5e7eb").stroke()
   })
 

@@ -8,6 +8,7 @@ import { Select } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/lib/format"
+import { stripLeadingZeros } from "@/lib/strip-leading-zeros"
 import { calculateTaxSummary, calculateLineAmount } from "@/lib/tax-calculator"
 import type { TaxRate } from "@/lib/tax-calculator"
 import type { InvoiceItemInput } from "@/schemas/invoice.schema"
@@ -247,6 +248,7 @@ export function InvoiceForm({ initialData }: Props) {
                   type="number"
                   value={item.unitPrice}
                   onChange={(e) => updateItem(index, "unitPrice", parseInt(e.target.value) || 0)}
+                  onBlur={stripLeadingZeros}
                 />
               </div>
               <div className="col-span-4 sm:col-span-1">
