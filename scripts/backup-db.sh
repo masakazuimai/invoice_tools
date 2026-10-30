@@ -3,6 +3,17 @@
 # launchd から毎月1回実行される想定。整合性のあるスナップショットを sqlite3 .backup で取得する。
 set -euo pipefail
 
+# 完了報告メール（成否にかかわらず必ず送る・共通の report_mail.py・2026-10-30 CEO指示）
+DEST=""
+report() {
+  local st=$?
+  local summary="バックアップに失敗（ログを確認）"
+  [ "$st" -eq 0 ] && summary="$(basename "$DEST") を作成"
+  /usr/bin/python3 "$HOME/.claude/automation/report_mail.py" send --job "invoice-tools 月次バックアップ" \
+    --status "$st" --category なし --summary "$summary" --body "保存先: ${DEST:-（作成前に停止）}" >/dev/null 2>&1 || true
+}
+trap report EXIT
+
 # スクリプトの位置からプロジェクトルート・DBパスを導出する
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 DB_PATH="$PROJECT_DIR/prisma/dev.db"
