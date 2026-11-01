@@ -47,15 +47,4 @@ rm -f "$TMP"
 
 echo "$(date '+%Y-%m-%d %H:%M:%S') バックアップ成功 -> $DEST"
 
-# 世代管理: 最新3世代だけ残し、古いものから削除する
-KEEP=3
-FILES="$(ls -1 "$BACKUP_DIR"/dev-*.db 2>/dev/null | sort)"
-COUNT="$(printf '%s\n' "$FILES" | grep -c .)"
-if [ "$COUNT" -gt "$KEEP" ]; then
-  REMOVE=$((COUNT - KEEP))
-  printf '%s\n' "$FILES" | head -n "$REMOVE" | while read -r OLD; do
-    [ -n "$OLD" ] || continue
-    rm -f "$OLD"
-    echo "$(date '+%Y-%m-%d %H:%M:%S') 古いバックアップを削除 -> $OLD"
-  done
-fi
+# 世代管理はしない（launchd からは macOS の権限でDriveフォルダの一覧取得・削除が拒否されるため。1ファイル約135KBで全世代残しても問題ない）
